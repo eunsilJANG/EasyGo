@@ -1,0 +1,52 @@
+.write-article-page {
+  padding: 20px;
+
+  .write-article-container {
+    max-width: 800px;
+    margin: 0 auto;
+
+    h1 {
+      margin-bottom: 20px;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+
+      input, textarea {
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+      }
+
+      textarea {
+        height: 300px;
+        resize: vertical;
+      }
+
+      .button-group {
+        display: flex;
+        gap: 10px;
+        justify-content: flex-end;
+
+        button {
+          padding: 8px 16px;
+          border: none;
+          border-radius: 4px;
+          cursor: pointer;
+
+          &[type="submit"] {
+            background-color: #007bff;
+            color: white;
+          }
+
+          &[type="button"] {
+            background-color: #6c757d;
+            color: white;
+          }
+        }
+      }
+    }
+  }
+} 

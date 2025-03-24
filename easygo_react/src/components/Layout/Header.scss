@@ -1,0 +1,127 @@
+@use "sass:color";
+
+// 색상 변수 정의
+$primary-color: #FF6B6B;
+$secondary-color: #4ECDC4;
+$background-color: #FFF9F5;
+$text-primary: #2D3436;
+$text-secondary: #636E72;
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.2rem 2rem;
+  background-color: white;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+
+  &__left {
+    .header__logo {
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      
+      .logo-text-easy {
+        font-size: 26px;
+        font-weight: bold;
+        color: $primary-color;
+        letter-spacing: -0.5px;
+      }
+      
+      .logo-text-travel {
+        font-size: 26px;
+        font-weight: bold;
+        color: $secondary-color;
+        letter-spacing: -0.5px;
+      }
+    }
+  }
+
+  &__right {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+
+    .user-profile {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      padding: 6px 16px;
+      background-color: $background-color;
+      border-radius: 50px;
+      transition: all 0.3s ease;
+
+      &:hover {
+        background-color: color.adjust($background-color, $lightness: -3%);
+      }
+
+      .profile-icon {
+        width: 36px;
+        height: 36px;
+        background-color: $secondary-color;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 500;
+        font-size: 16px;
+        box-shadow: 0 2px 8px rgba($secondary-color, 0.3);
+      }
+
+      .username {
+        color: $text-primary;
+        font-size: 15px;
+        font-weight: 500;
+      }
+    }
+
+    .menu-button {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0.8rem;
+      border-radius: 50%;
+      transition: all 0.3s ease;
+
+      &:hover {
+        background-color: $background-color;
+
+        .menu-icon,
+        .menu-icon::before,
+        .menu-icon::after {
+          background-color: $primary-color;
+        }
+      }
+
+      .menu-icon {
+        display: block;
+        width: 24px;
+        height: 2px;
+        background-color: $text-primary;
+        position: relative;
+        transition: all 0.3s ease;
+
+        &::before,
+        &::after {
+          content: '';
+          position: absolute;
+          width: 24px;
+          height: 2px;
+          background-color: $text-primary;
+          left: 0;
+          transition: all 0.3s ease;
+        }
+
+        &::before {
+          top: -6px;
+        }
+
+        &::after {
+          bottom: -6px;
+        }
+      }
+    }
+  }
+} 

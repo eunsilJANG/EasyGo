@@ -1,0 +1,72 @@
+server:
+  port: 8080
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/easygo_db
+    username: postgres
+    password: 3156
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: create
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: YOUR_CLIENT_ID
+            client-secret: YOUR_CLIENT_SECRET
+            redirect-uri: "{baseUrl}/login/oauth2/code/google"
+            scope:
+              - email
+              - profile
+              - openid
+  #          user-name-attribute: sub
+  #      provider:
+  #        google:
+  #          user-info-uri: https://www.googleapis.com/oauth2/v3/userinfo
+  #          user-name-attribute: sub
+
+jwt:
+  issuer: ajufresh@gmail.com
+  secretkey: project-springboot-iwannadododododododododododo
+
+
+
+logging:
+  level:
+    org.springframework.security: DEBUG
+    org.springframework.security.oauth2: TRACE
+    org.springframework.security.oauth2.client: TRACE
+    org.springframework.security.oauth2.core: TRACE
+
+
+    #spring:
+    #  datasource:
+    #    url: jdbc:h2:mem:testdb
+    #    username: sa
+    #    password:
+    #    driver-class-name: org.h2.Driver
+    #  h2:
+    #    console:
+    #      enabled: true
+    #  jpa:
+    #    show-sql: true
+    #    hibernate:
+    #      ddl-auto: create
+    #    properties:
+    #      hibernate:
+    #        format_sql: true
+    #    defer-datasource-initialization: true
+    #  sql:
+    #    init:
+    #      mode: always
+    #

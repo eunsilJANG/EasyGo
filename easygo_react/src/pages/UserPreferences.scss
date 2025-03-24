@@ -1,0 +1,283 @@
+@use "sass:color";
+@use '../App.scss' as *;
+
+// DatePicker 커스텀 스타일
+.react-datepicker {
+  font-family: inherit;
+  border: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  
+  &__header {
+    background-color: white;
+    border-bottom: 1px solid #f0f0f0;
+  }
+
+  &__navigation {
+    top: 12px;
+  }
+
+  &__month {
+    margin: 0.5rem;
+  }
+
+  &__day {
+    margin: 0.2rem;
+    border-radius: 4px;
+    
+    &:hover {
+      background-color: $background-color;
+    }
+
+    &--selected,
+    &--in-range {
+      background-color: $primary-color !important;
+      color: white !important;
+    }
+
+    &--in-selecting-range {
+      background-color: color.adjust($primary-color, $lightness: 20%) !important;
+      color: white !important;
+    }
+  }
+}
+
+.user-preferences {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2.5rem;
+  background-color: white;
+  border-radius: 20px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+
+  h2 {
+    color: $text-primary;
+    margin-bottom: 2.5rem;
+    font-size: 26px;
+    text-align: center;
+    font-weight: 600;
+  }
+
+  h3 {
+    color: $text-primary;
+    margin-bottom: 1.2rem;
+    font-size: 18px;
+    font-weight: 500;
+  }
+
+  section {
+    margin-bottom: 2.5rem;
+    padding: 1.8rem;
+    background-color: $background-color;
+    border-radius: 16px;
+
+    &:last-of-type {
+      margin-bottom: 2.5rem;
+    }
+  }
+
+  // 지역 선택 섹션
+  .region-section {
+    .region-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      gap: 1rem;
+
+      .region-button {
+        padding: 1rem;
+        background: white;
+        border-radius: 8px;
+        color: $text-secondary;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        font-size: 16px;
+
+        &:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        &.active {
+          background: $primary-color;
+          color: white;
+        }
+      }
+    }
+  }
+
+  // 날짜 선택 섹션
+  .date-section {
+    .date-display {
+      display: flex;
+      gap: 2rem;
+      align-items: flex-start;
+
+      .calendar-container {
+        background: white;
+        padding: 1rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      }
+
+      .selected-info {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+
+        .calendar-preview {
+          background: white;
+          padding: 1rem;
+          border-radius: 8px;
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+
+          .calendar-header {
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: $text-secondary;
+          }
+
+          .selected-dates {
+            color: $primary-color;
+            font-weight: 500;
+          }
+        }
+
+        .weather-info {
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+          padding: 1rem;
+          background: white;
+          border-radius: 8px;
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+
+          .weather-icon {
+            font-size: 24px;
+          }
+
+          .weather-text {
+            small {
+              color: $text-secondary;
+              font-size: 12px;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // 연령대 선택 섹션
+  .age-section {
+    .age-groups {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+      gap: 1rem;
+
+      .age-button {
+        padding: 0.8rem;
+        background: white;
+        border-radius: 8px;
+        color: $text-secondary;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+
+        &:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        &.active {
+          background: $primary-color;
+          color: white;
+        }
+      }
+    }
+  }
+
+  // 인원 설정 섹션
+  .travelers-section {
+    .travelers-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+
+      .traveler-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+
+        .traveler-type {
+          font-weight: 500;
+          color: $text-primary;
+        }
+
+        .traveler-controls {
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+
+          .control-button {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: $background-color;
+            color: $text-primary;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+
+            &:hover {
+              background: $primary-color;
+              color: white;
+            }
+          }
+
+          .traveler-count {
+            min-width: 40px;
+            text-align: center;
+            font-weight: 500;
+          }
+        }
+      }
+    }
+  }
+
+  // 저장 버튼
+  .save-button {
+    width: 100%;
+    padding: 1rem;
+    background: $primary-color;
+    color: white;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    margin-top: 1rem;
+
+    &:hover {
+      background: color.adjust($primary-color, $lightness: -5%);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba($primary-color, 0.3);
+    }
+  }
+
+  // 반응형 디자인
+  @media (max-width: 768px) {
+    .date-section {
+      .date-display {
+        flex-direction: column;
+
+        .calendar-container,
+        .selected-info {
+          width: 100%;
+        }
+      }
+    }
+  }
+} 
