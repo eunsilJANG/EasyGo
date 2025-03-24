@@ -3,7 +3,7 @@ server:
 
 spring:
   profiles:
-    active: local   # 👈 application-local.yml을 읽도록 지정
+    active: local   # application-local.yml을 읽도록 지정
 
   datasource:
     url: jdbc:postgresql://localhost:5432/easygo_db
