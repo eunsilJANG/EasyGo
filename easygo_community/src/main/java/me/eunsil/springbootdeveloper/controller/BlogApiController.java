@@ -17,6 +17,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.security.Principal;
 import java.util.List;
@@ -29,7 +30,10 @@ public class BlogApiController {
     private final UserService userService;
 
     @PostMapping("/api/articles")
-    public ResponseEntity<Article> addArticle(@RequestBody AddArticleRequest request) {
+    public ResponseEntity<Article> addArticle(
+        @RequestPart(value = "article") AddArticleRequest request,
+        @RequestPart(value = "files", required = false) List<MultipartFile> files
+    ) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         if (authentication == null || !authentication.isAuthenticated()) {
@@ -50,6 +54,13 @@ public class BlogApiController {
                 .content(request.getContent())
                 .user(user)  // 현재 사용자 설정
                 .build();
+
+        // 파일 처리 로직 추가
+        if (files != null && !files.isEmpty()){
+            // 파일 저장 및 처리 로직
+            List<String> fileUrls = blogService.saveFiles(files);
+            article.setFileUrls(fileUrls); // Article 엔티티에 파일 URL 목록 저장
+        }
 
         Article savedArticle = blogService.save(article);
 

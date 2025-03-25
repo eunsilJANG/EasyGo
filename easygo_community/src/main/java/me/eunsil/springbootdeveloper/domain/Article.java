@@ -10,6 +10,8 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @EntityListeners(AuditingEntityListener.class)
 @Entity
@@ -40,13 +42,24 @@ public class Article {
     @JoinColumn(name = "user_id")
     private User user;
 
+    @ElementCollection  // 컬렉션 매핑
+    @CollectionTable(
+        name = "article_file_urls",  // 새로운 테이블 이름
+        joinColumns = @JoinColumn(name = "article_id")  // 외래 키
+    )
+    @Column(name = "file_url")
+    private List<String> fileUrls = new ArrayList<>();  // 파일 URL 목록
+
     @Builder(toBuilder = true)
-    public Article(String title, String content, User user, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public Article(String title, String content, User user, LocalDateTime createdAt, LocalDateTime updatedAt, List<String> fileUrls) {
         this.title = title;
         this.content = content;
         this.user = user;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
+        if (fileUrls != null) {
+            this.fileUrls = fileUrls;
+        }
     }
 
 //    클래스 위에 @Builder: 클래스의 모든 생성자에 대해 빌더 패턴을 자동으로 적용합니다.
@@ -59,5 +72,10 @@ public class Article {
         this.title = title;
         this.content = content;
         this.updatedAt = updatedAt;
+    }
+
+    // fileUrls setter 메서드 추가
+    public void setFileUrls(List<String> fileUrls) {
+        this.fileUrls = fileUrls;
     }
 }

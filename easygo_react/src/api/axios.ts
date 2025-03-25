@@ -5,7 +5,7 @@ const api = axios.create({
   withCredentials: true  // 모든 요청에 쿠키 포함
 });
 
-// 요청 인터셉터
+// 요청 인터셉터: 요청 시 액세스 토큰 자동 첨부
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('access_token');
@@ -19,7 +19,7 @@ api.interceptors.request.use(
   }
 );
 
-// 응답 인터셉터
+// 응답 인터셉터: 토큰 만료 시 자동 갱신
 api.interceptors.response.use(
   (response) => response,
   async (error) => {

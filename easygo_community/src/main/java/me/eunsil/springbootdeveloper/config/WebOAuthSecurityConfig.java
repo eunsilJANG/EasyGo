@@ -49,7 +49,12 @@ public class WebOAuthSecurityConfig {
     @Bean
     public WebSecurityCustomizer configure(){ // 스프링 시큐리티 기능 비활성화
         return (web) -> web.ignoring()
-                .requestMatchers("/img/**", "/css/**", "/js/**");
+                .requestMatchers(
+                    "/img/**", 
+                    "/css/**", 
+                    "/js/**",
+                    "/uploads/**"  // 업로드된 파일 경로 추가
+                );
     }
 
     @Bean
@@ -66,7 +71,18 @@ public class WebOAuthSecurityConfig {
                 .addFilterBefore(tokenAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
                 // 토큰 재발급 url은 인증 없이 접근 가능하도록 설정. 나머지 api url은 인증 필요
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/token", "/api/login", "/api/signup", "/login/oauth2/code/**", "/oauth2/**", "/login", "/", "/error", "/api/user/nickname")
+                        .requestMatchers(
+                            "/api/token", 
+                            "/api/login", 
+                            "/api/signup", 
+                            "/login/oauth2/code/**", 
+                            "/oauth2/**", 
+                            "/login", 
+                            "/", 
+                            "/error", 
+                            "/api/user/nickname",
+                            "/uploads/**"  // 업로드된 파일 경로 추가
+                        )
                         // /api/token 토큰 재발급 url
                         .permitAll()
                         .anyRequest().authenticated())
@@ -117,6 +133,7 @@ public class WebOAuthSecurityConfig {
         configuration.setAllowedOrigins(List.of("http://localhost:5173", "http://localhost:5174")); // 리액트 앱의 도메인
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS")); // OPTIONS 추가
         configuration.setAllowedHeaders(List.of("*")); // 모든 헤더 허용
+        configuration.setExposedHeaders(List.of("Content-Disposition"));  // 파일 다운로드를 위한 헤더 추가
         configuration.setAllowCredentials(true); // 자격 증명(쿠키) 허용
         configuration.setMaxAge(3600L);
 
