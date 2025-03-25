@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import api from '../api/axios';  // api 인스턴스 import
 import './SetNickname.scss';
 
 const SetNickname = () => {
@@ -27,16 +28,9 @@ const SetNickname = () => {
     if (!nickname.trim()) return;
 
     try {
-      console.log('Sending token:', localStorage.getItem('access_token'));
-
-      const response = await fetch('http://localhost:8080/api/user/nickname', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('access_token')}`
-        },
-        credentials: 'include',
-        body: JSON.stringify({ nickname })
+      // fetch 대신 api.post 사용
+      const response = await api.post('/api/user/nickname', {
+        nickname
       });
 
       console.log('Response status:', response.status);
@@ -47,19 +41,11 @@ const SetNickname = () => {
         navigate('/preferences');
         return; // 여기서 완전히 종료
       }
-
-      // 200이 아닌 경우에만 실행
-      const errorText = await response.text();
-      console.error('서버 응답:', errorText);
-      
-      if (response.status === 401) {
-        localStorage.removeItem('access_token');
-        navigate('/login');
-      } else {
-        console.error('닉네임 설정 실패:', response.status);
-      }
     } catch (error) {
       console.error('API 호출 실패:', error);
+      if (error.response?.status === 401) {
+        navigate('/login');
+      }
     }
   };
 

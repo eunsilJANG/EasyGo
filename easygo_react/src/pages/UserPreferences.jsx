@@ -5,6 +5,7 @@ import { ko } from 'date-fns/locale';
 import "react-datepicker/dist/react-datepicker.css";
 import './UserPreferences.scss';
 import useUserStore from '../store/userStore';
+import api from '../api/axios';  // api 인스턴스 import 추가
 
 const UserPreferences = () => {
   const navigate = useNavigate();
@@ -50,70 +51,37 @@ const UserPreferences = () => {
   const ageGroups = ['10대', '20대', '30대', '40대', '50대', '60대', '70대', '80대'];
 
   useEffect(() => {
-    // token이 이미 localStorage에 있다면 사용자 정보 가져오기
-    navigate('/preferences', { replace: true });
-    const existingToken = localStorage.getItem('access_token');
-    if (existingToken) {
-      console.log('Using existing token:', existingToken);
-      fetch('http://localhost:8080/api/user/me', {
-        headers: {
-          'Authorization': `Bearer ${existingToken}`
-        },
-        credentials: 'include'
-      })
-      .then(response => {
-        console.log('Response status:', response.status);
-        if (!response.ok) throw new Error('Failed to fetch user info');
-        return response.json();
-      })
-      .then(user => {
-        console.log('User data:', user);
-        if (user && user.nickname) {
-          localStorage.setItem('user_nickname', user.nickname);
-          console.log('Nickname saved:', user.nickname);
-          setNickname(user.nickname);
-        }
-      })
-      .catch(error => {
-        console.error('Error fetching user info:', error);
-      });
-      return;
+    const params = new URLSearchParams(location.search);
+    const tokenInUrl = params.get('token');
+    
+    // 1. URL에 토큰이 있으면 저장
+    if (tokenInUrl) {
+      console.log('New token from URL:', tokenInUrl);
+      localStorage.setItem('access_token', tokenInUrl);
+      navigate('/preferences', { replace: true });
     }
 
-    // URL에서 token을 찾아 저장 (OAuth 로그인 시)
-    const params = new URLSearchParams(location.search);
-    const token = params.get('token');
-    if (token) {
-      console.log('New token from URL:', token);
-      localStorage.setItem('access_token', token);
-      
-      // 토큰 저장 후 URL 정리
-      navigate('/preferences', { replace: true });
-      
-      fetch('http://localhost:8080/api/user/me', {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        },
-        credentials: 'include'
-      })
-      .then(response => {
-        console.log('Response status:', response.status);
-        if (!response.ok) throw new Error('Failed to fetch user info');
-        return response.json();
-      })
-      .then(user => {
-        console.log('User data:', user);
-        if (user && user.nickname) {
-          localStorage.setItem('user_nickname', user.nickname);
-          console.log('Nickname saved:', user.nickname);
-          setNickname(user.nickname);
+    // 2. 사용자 정보 가져오기
+    const fetchUserInfo = async () => {
+      try {
+        const response = await api.get('/api/user/me');
+        console.log('User data:', response.data);
+        
+        if (response.data?.nickname) {
+          localStorage.setItem('user_nickname', response.data.nickname);
+          console.log('Nickname saved:', response.data.nickname);
+          setNickname(response.data.nickname);
         }
-      })
-      .catch(error => {
+      } catch (error) {
         console.error('Error fetching user info:', error);
-      });
+      }
+    };
+
+    // 토큰이 있을 때만 사용자 정보 요청
+    if (tokenInUrl || localStorage.getItem('access_token')) {
+      fetchUserInfo();
     }
-  }, [location, setNickname, navigate]);
+  }, [setNickname, navigate, location.search]);
 
   return (
     <div className="page-container">

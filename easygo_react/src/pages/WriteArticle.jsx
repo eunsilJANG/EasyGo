@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import api from '../api/axios';  // api 인스턴스 import 추가
 import './WriteArticle.scss';
 
 const WriteArticle = () => {
@@ -11,39 +12,18 @@ const WriteArticle = () => {
     e.preventDefault();
 
     try {
-      const token = localStorage.getItem('access_token');
-      if (!token) {
-        alert('로그인이 필요합니다.');
-        navigate('/login');
-        return;
-      }
-
       // 요청 데이터 로깅
       console.log('Sending data:', { title, content });
-      console.log('Using token:', token);
 
-      const response = await fetch('http://localhost:8080/api/articles', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-          'Accept': 'application/json'
-        },
-        credentials: 'include',
-        body: JSON.stringify({
-          title,
-          content
-        })
+      // fetch를 api.post로 교체
+      const response = await api.post('/api/articles', {
+        title,
+        content
       });
 
       // 응답 상태 및 데이터 로깅
       console.log('Response status:', response.status);
-      const responseText = await response.text();
-      console.log('Response text:', responseText);
-
-      if (!response.ok) {
-        throw new Error(responseText || '글 작성에 실패했습니다.');
-      }
+      console.log('Response data:', response.data);
 
       alert('글이 성공적으로 등록되었습니다.');
       navigate('/community');
