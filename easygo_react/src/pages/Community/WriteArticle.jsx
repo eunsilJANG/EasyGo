@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import api from '../api/axios';  // api 인스턴스 import 추가
+import api from '../../api/axios';  // 수정
 import './WriteArticle.scss';
 
 const WriteArticle = () => {
@@ -74,8 +74,7 @@ const WriteArticle = () => {
 
   return (
     <div className="write-article-page">
-      <div className="write-article-container">
-        <h1>글 작성하기</h1>
+      <div className="article-container">
         <form onSubmit={handleSubmit}>
           <input
             type="text"
@@ -83,6 +82,7 @@ const WriteArticle = () => {
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             required
+            className="title-input"
           />
           <textarea
             placeholder="내용을 입력하세요"

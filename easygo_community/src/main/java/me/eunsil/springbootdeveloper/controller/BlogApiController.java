@@ -19,6 +19,7 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.security.Principal;
 import java.util.List;
 @Slf4j
@@ -34,38 +35,46 @@ public class BlogApiController {
         @RequestPart(value = "article") AddArticleRequest request,
         @RequestPart(value = "files", required = false) List<MultipartFile> files
     ) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        if (authentication == null || !authentication.isAuthenticated()) {
-            throw new IllegalStateException("Not authenticated");
+            if (authentication == null || !authentication.isAuthenticated()) {
+                throw new IllegalStateException("Not authenticated");
+            }
+
+            String email = authentication.getName();
+            log.info("Current user email: {}", email);
+
+            User user = userService.findByEmail(email);
+            log.info("Found user: {}", user);
+
+            if (user.getNickname() == null) {
+                throw new IllegalStateException("Nickname not set");
+            }
+            Article article = Article.builder()
+                    .title(request.getTitle())
+                    .content(request.getContent())
+                    .user(user)
+                    .build();
+
+            if (files != null && !files.isEmpty()) {
+                try {
+                    List<String> fileUrls = blogService.saveFiles(files);
+                    article.setFileUrls(fileUrls);
+                    log.info("Saved files with URLs: {}", fileUrls);
+                } catch (IOException e) {
+                    log.error("File save error: ", e);
+                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+                }
+            }
+
+            Article savedArticle = blogService.save(article);
+            return ResponseEntity.status(HttpStatus.CREATED).body(savedArticle);
+
+        } catch (Exception e) {
+            log.error("Article save error: ", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
-
-        String email = authentication.getName();
-        log.info("Current user email: {}", email);
-
-        User user = userService.findByEmail(email);
-        log.info("Found user: {}", user);
-
-        if (user.getNickname() == null) {
-            throw new IllegalStateException("Nickname not set");
-        }
-        Article article = Article.builder()
-                .title(request.getTitle())
-                .content(request.getContent())
-                .user(user)  // 현재 사용자 설정
-                .build();
-
-        // 파일 처리 로직 추가
-        if (files != null && !files.isEmpty()){
-            // 파일 저장 및 처리 로직
-            List<String> fileUrls = blogService.saveFiles(files);
-            article.setFileUrls(fileUrls); // Article 엔티티에 파일 URL 목록 저장
-        }
-
-        Article savedArticle = blogService.save(article);
-
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(savedArticle);
     }
 
     @GetMapping("/api/articles")
@@ -83,6 +92,8 @@ public class BlogApiController {
     public ResponseEntity<ArticleResponse> findArticle(@PathVariable("id") long id){
         Article article = blogService.findById(id);
 
+        log.info("File URLs: {}", article.getFileUrls());   
+
         return ResponseEntity.ok().body(new ArticleResponse(article));
     }
 
@@ -94,9 +105,13 @@ public class BlogApiController {
     }
 
     @PutMapping("/api/articles/{id}")
-    public ResponseEntity<Article> updateArticle(@PathVariable("id") long id, @RequestBody UpdateArticleRequest request) {
-        Article updatedArticle = blogService.update(id, request);
-
-        return ResponseEntity.ok().body(updatedArticle);
+    public ResponseEntity<Article> updateArticle(
+        @PathVariable(name = "id") long id,
+        @RequestPart(value = "article") UpdateArticleRequest request,
+        @RequestPart(value = "files", required = false) List<MultipartFile> files
+    ) {
+        Article updatedArticle = blogService.update(id, request, files);
+        return ResponseEntity.ok()
+            .body(updatedArticle);
     }
 }

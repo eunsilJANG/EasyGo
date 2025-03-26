@@ -1,0 +1,86 @@
+.write-article-page {
+  padding: 40px 20px;
+  background-color: #fff;
+
+  .article-container {
+    max-width: 768px;
+    margin: 0 auto;
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+
+      .title-input {
+        font-size: 28px;
+        padding: 10px 0;
+        border: none;
+        border-bottom: 1px solid #eee;
+        font-weight: 600;
+        
+        &:focus {
+          outline: none;
+          border-color: #ddd;
+        }
+
+        &::placeholder {
+          color: #aaa;
+        }
+      }
+
+      textarea {
+        min-height: 400px;
+        padding: 20px 0;
+        border: none;
+        resize: vertical;
+        font-size: 16px;
+        line-height: 1.8;
+        
+        &:focus {
+          outline: none;
+        }
+      }
+
+      .file-upload-section {
+        padding: 20px 0;
+        border-top: 1px solid #eee;
+      }
+
+      .button-group {
+        padding: 20px 0;
+        display: flex;
+        gap: 10px;
+        justify-content: flex-end;
+
+        button {
+          padding: 8px 20px;
+          border-radius: 6px;
+          font-size: 14px;
+          font-weight: 500;
+          transition: all 0.2s ease;
+          cursor: pointer;
+
+          &[type="submit"] {
+            background-color: #5CCCC9;
+            color: white;
+            border: none;
+
+            &:hover {
+              background-color: #4BB3B0;
+            }
+          }
+
+          &[type="button"] {
+            background-color: #f8f9fa;
+            color: #4b5563;
+            border: 1px solid #e5e7eb;
+
+            &:hover {
+              background-color: #e9ecef;
+            }
+          }
+        }
+      }
+    }
+  }
+} 

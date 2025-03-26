@@ -18,6 +18,9 @@ spring:
       max-request-size: 50MB  # 요청당 최대 파일 크기
       location: ${java.io.tmpdir}  # 임시 저장 경로 Windows: 보통 C:\Users\{사용자명}\AppData\Local\Temp
 
+  web:
+    resources:
+      static-locations: file:C:/IDE/easygo/easygo_community/uploads/  # 이 부분 추가
 
   jpa:
     hibernate:

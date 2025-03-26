@@ -52,8 +52,7 @@ public class WebOAuthSecurityConfig {
                 .requestMatchers(
                     "/img/**", 
                     "/css/**", 
-                    "/js/**",
-                    "/uploads/**"  // 업로드된 파일 경로 추가
+                    "/js/**"
                 );
     }
 
@@ -83,7 +82,7 @@ public class WebOAuthSecurityConfig {
                             "/api/user/nickname",
                             "/uploads/**"  // 업로드된 파일 경로 추가
                         )
-                        // /api/token 토큰 재발급 url
+                    
                         .permitAll()
                         .anyRequest().authenticated())
                 .oauth2Login(oauth2 -> oauth2

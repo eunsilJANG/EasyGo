@@ -10,9 +10,10 @@ import ContentInput from './pages/ContentInput';
 import PlaceSelection from './pages/PlaceSelection';
 import UserPreferences from './pages/UserPreferences';
 import SignUp from './pages/SignUp';
-import Community from './pages/Community';
+import Community from './pages/Community/ArticleList';
 import SetNickname from './pages/SetNickname';
-import WriteArticle from './pages/WriteArticle';
+import WriteArticle from './pages/Community/WriteArticle';
+import ArticleDetail from './pages/Community/ArticleDetail';
 
 import './App.scss'; // 글로벌 스타일링
 
@@ -37,6 +38,7 @@ const AppLayout = () => {
         <Route path="/preferences" element={<UserPreferences />} />
         <Route path="/community" element={<Community />} />
         <Route path="/community/write" element={<WriteArticle />} />
+        <Route path="/community/articles/:id" element={<ArticleDetail />} />
         <Route path="/link" element={<div>Link Page</div>} />
         <Route path="/travel" element={<div>Travel Page</div>} />
         <Route path="/mypage" element={<div>MyPage</div>} />

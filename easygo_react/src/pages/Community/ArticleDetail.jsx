@@ -1,0 +1,253 @@
+import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import api, { IMAGE_BASE_URL } from '../../api/axios';
+import './ArticleDetail.scss';
+
+const ArticleDetail = () => {
+  const [article, setArticle] = useState(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editForm, setEditForm] = useState({ title: '', content: '' });
+  const [loading, setLoading] = useState(true);
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const [files, setFiles] = useState([]);
+  const [previewUrls, setPreviewUrls] = useState([]);
+  const [existingFiles, setExistingFiles] = useState([]);
+
+  useEffect(() => {
+    fetchArticle();
+  }, [id]);
+
+  const fetchArticle = async () => {
+    try {
+      const response = await api.get(`/api/articles/${id}`);
+      console.log('Article data:', response.data); // 데이터 확인용
+      setArticle(response.data);
+      setEditForm({
+        title: response.data.title,
+        content: response.data.content
+      });
+      setExistingFiles(response.data.fileUrls || []);
+      setLoading(false);
+    } catch (error) {
+      console.error('Error:', error);
+      alert('게시글을 불러오는데 실패했습니다.');
+      navigate('/community');
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!window.confirm('정말로 이 게시글을 삭제하시겠습니까?')) return;
+    try {
+      await api.delete(`/api/articles/${id}`);
+      alert('게시글이 삭제되었습니다.');
+      navigate('/community');
+    } catch (error) {
+      alert('게시글 삭제에 실패했습니다.');
+    }
+  };
+
+  const handleFileChange = (e) => {
+    const selectedFiles = Array.from(e.target.files);
+    setFiles(prev => [...prev, ...selectedFiles]);
+    
+    // 이미지 미리보기 생성
+    selectedFiles.forEach(file => {
+      if (file.type.startsWith('image/')) {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setPreviewUrls(prev => [...prev, reader.result]);
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+  };
+
+  const handleRemoveFile = (index) => {
+    setFiles(prev => prev.filter((_, i) => i !== index));
+    setPreviewUrls(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const handleRemoveExistingFile = (index) => {
+    setExistingFiles(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const handleUpdate = async () => {
+    try {
+      const formData = new FormData();
+      
+      // 수정된 게시글 데이터
+      const articleData = {
+        title: editForm.title,
+        content: editForm.content,
+        fileUrls: existingFiles
+      };
+
+      // article 데이터를 formData에 추가
+      formData.append('article', new Blob([JSON.stringify(articleData)], {
+        type: 'application/json'
+      }));
+
+      // 새로운 파일들이 있다면 추가
+      if (files.length > 0) {
+        files.forEach(file => {
+          formData.append('files', file);
+        });
+      }
+
+      await api.put(`/api/articles/${id}`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      
+      alert('게시글이 수정되었습니다.');
+      setIsEditing(false);
+      await fetchArticle();
+      // 페이지 최상단으로 스크롤 이동
+      window.scrollTo(0, 0);
+    } catch (error) {
+      console.error('Update error:', error);
+      alert('게시글 수정에 실패했습니다.');
+    }
+  };
+
+  if (loading) return <div className="loading">로딩 중...</div>;
+  if (!article) return <div className="error">게시글을 찾을 수 없습니다.</div>;
+
+  return (
+    <div className="article-detail-page">
+      <div className="article-container">
+        {isEditing ? (
+          <form className="article-content editing">
+            <input
+              type="text"
+              value={editForm.title}
+              onChange={(e) => setEditForm({...editForm, title: e.target.value})}
+              placeholder="제목을 입력하세요"
+              className="title-input"
+            />
+            <textarea
+              value={editForm.content}
+              onChange={(e) => setEditForm({...editForm, content: e.target.value})}
+              placeholder="내용을 입력하세요"
+            />
+            
+            <div className="file-upload-section">       
+              <h4>새 파일 추가</h4>    
+              <input
+                type="file"
+                multiple
+                onChange={handleFileChange}
+                className="file-input"
+              />
+              {previewUrls.length > 0 && (
+                <div className="preview-section">
+                  {previewUrls.map((url, index) => (
+                    <div key={index} className="preview-item">
+                      <img src={url} alt={`Preview ${index + 1}`} />
+                      <button
+                        type="button"
+                        className="remove-file"
+                        onClick={() => handleRemoveFile(index)}
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+           
+              {existingFiles.length > 0 && (
+                <div className="existing-files">
+                  <h4>기존 첨부 파일</h4>
+                  <div className="file-list">
+                    {existingFiles.map((url, index) => (
+                      <div key={index} className="file-item">
+                        <img 
+                          src={`${IMAGE_BASE_URL}${url}`}
+                          alt={`기존 이미지 ${index + 1}`}
+                        />
+                        <button
+                          type="button"
+                          className="remove-file"
+                          onClick={() => handleRemoveExistingFile(index)}
+                        >
+                          ×
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div className="fixed-button-group">
+              <button type="button" onClick={() => setIsEditing(false)} className="cancel-btn">
+                취소
+              </button>
+              <button type="button" onClick={handleUpdate} className="save-btn">
+                저장
+              </button>
+            </div>
+          </form>
+        ) : (
+          <div className="article-content">
+            <div className="article-header">
+              <h1 className="title">{article.title}</h1>
+              <div className="article-meta">
+                <span className="author">{article.nickname}</span>
+                <span className="separator">·</span>
+                <span className="date">{new Date(article.createdAt).toLocaleString()}</span>
+              </div>
+            </div>
+            
+            <div className="content">
+              {article.content}
+            </div>
+
+            {article.fileUrls && article.fileUrls.length > 0 && (
+              <div className="file-section">
+                <h4>첨부 파일</h4>
+                <div className="file-list">
+                  {article.fileUrls.map((url, index) => {
+                    const fullUrl = `${IMAGE_BASE_URL}${url}`;
+                    console.log('Full image URL:', fullUrl); // 디버깅용
+                    return (
+                      <div key={index} className="file-item">
+                        <img 
+                          src={fullUrl}
+                          alt={`첨부 이미지 ${index + 1}`}
+                          onError={(e) => {
+                            console.error('Image load error for URL:', fullUrl);
+                            e.target.style.display = 'none';
+                          }}
+                        />
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            <div className="button-group">
+              <button onClick={() => navigate('/community')} className="back-btn">
+                목록으로
+              </button>
+              <div>
+                <button onClick={() => setIsEditing(true)} className="edit-btn">
+                  수정
+                </button>
+                <button onClick={handleDelete} className="delete-btn">
+                  삭제
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default ArticleDetail; 

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import api from '../api/axios';  // api 인스턴스 import
-import './Community.scss';
+import api from '../../api/axios';  // 수정
+import './ArticleList.scss';
 
 const Community = () => {
   const [articles, setArticles] = useState([]);
