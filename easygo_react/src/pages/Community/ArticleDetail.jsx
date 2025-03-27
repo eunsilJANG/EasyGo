@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import api, { IMAGE_BASE_URL } from '../../api/axios';
 import './ArticleDetail.scss';
+import Comments from './Comments';
 
 const ArticleDetail = () => {
   const [article, setArticle] = useState(null);
@@ -56,7 +57,7 @@ const ArticleDetail = () => {
       if (file.type.startsWith('image/')) {
         const reader = new FileReader();
         reader.onloadend = () => {
-          setPreviewUrls(prev => [...prev, reader.result]);
+          setPreviewUrls(prev => [...prev, reader.result]); // previewUrls에는 base64로 변환된 이미지 URL 저장
         };
         reader.readAsDataURL(file);
       }
@@ -68,7 +69,7 @@ const ArticleDetail = () => {
     setPreviewUrls(prev => prev.filter((_, i) => i !== index));
   };
 
-  const handleRemoveExistingFile = (index) => {
+  const handleRemoveExistingFile = (index) => { // 클라이언트 상에서만 제거
     setExistingFiles(prev => prev.filter((_, i) => i !== index));
   };
 
@@ -134,16 +135,17 @@ const ArticleDetail = () => {
             />
             
             <div className="file-upload-section">       
-              <h4>새 파일 추가</h4>    
+              <h4>새 파일 추가 (이미지 파일만 가능)</h4>    
               <input
                 type="file"
                 multiple
+                accept="image/*"
                 onChange={handleFileChange}
                 className="file-input"
               />
               {previewUrls.length > 0 && (
                 <div className="preview-section">
-                  {previewUrls.map((url, index) => (
+                  {previewUrls.map((url, index) => ( // previewUrls에 있는 base64 이미지 URL을 <img>로 렌더
                     <div key={index} className="preview-item">
                       <img src={url} alt={`Preview ${index + 1}`} />
                       <button
@@ -153,11 +155,11 @@ const ArticleDetail = () => {
                       >
                         ×
                       </button>
-                    </div>
+                    </div> 
                   ))}
                 </div>
               )}
-           
+              {/* 서버에서 받은 파일 URL을 기반으로 실제 이미지 보여줌 */}
               {existingFiles.length > 0 && (
                 <div className="existing-files">
                   <h4>기존 첨부 파일</h4>
@@ -191,7 +193,7 @@ const ArticleDetail = () => {
               </button>
             </div>
           </form>
-        ) : (
+        ) : ( // 수정 모드가 아닐 때
           <div className="article-content">
             <div className="article-header">
               <h1 className="title">{article.title}</h1>
@@ -245,6 +247,8 @@ const ArticleDetail = () => {
             </div>
           </div>
         )}
+        
+        {!isEditing && <Comments articleId={id} />}
       </div>
     </div>
   );

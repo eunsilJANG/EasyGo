@@ -1,5 +1,6 @@
 package me.eunsil.springbootdeveloper.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
@@ -10,8 +11,7 @@ import java.util.Collection;
 import java.util.List;
 
 @Table(name = "users")
-@NoArgsConstructor
-//        (access = AccessLevel.PROTECTED)
+@NoArgsConstructor //        (access = AccessLevel.PROTECTED)
 @Setter
 @Getter
 @Entity

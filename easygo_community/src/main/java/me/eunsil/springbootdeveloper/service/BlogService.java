@@ -118,7 +118,7 @@ public class BlogService {
                 
                 // 파일 저장
                 File targetFile = new File(directory, savedFilename);
-                file.transferTo(targetFile);
+                file.transferTo(targetFile); // transferTo()는 MultipartFile의 내용을 서버 디스크에 실제로 저장하는 메서드
                 
                 // URL 생성
                 String fileUrl = "/uploads/" + savedFilename;
