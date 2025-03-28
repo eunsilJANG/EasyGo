@@ -4,6 +4,9 @@ import lombok.*;
 import me.eunsil.springbootdeveloper.domain.Comment;
 
 import java.time.LocalDateTime;
+import java.util.List;  // 이 import 추가
+import java.util.stream.Collectors;  // 이것도 필요합니다
+
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -18,6 +21,10 @@ public class CommentResponse {
     private long userid;
     private LocalDateTime createdAt;
     private boolean minecheck;
+    private Long parentId;
+    private Integer depth;
+    private List<CommentResponse> children;
+
 
     public CommentResponse(Comment comment, Long currentUserId){
         this.id = comment.getId();
@@ -27,6 +34,11 @@ public class CommentResponse {
         this.userid = comment.getUser().getId();
         this.createdAt = comment.getCreatedAt();
         this.minecheck = comment.getUser().getId().equals(currentUserId);
+        this.parentId = comment.getParent() !=null ? comment.getParent().getId() : null;
+        this.depth = comment.getDepth();
+        this.children = comment.getChildren().stream().map(child -> new CommentResponse(child, currentUserId)).toList();
+        
+
     }
 
 

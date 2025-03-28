@@ -29,48 +29,36 @@ public class CommentApiController {
     private final BlogService blogService;
 
     @PostMapping("/api/articles/{articleId}/comments")
-    public ResponseEntity<CommentResponse> addComment(@RequestBody CommentDto newComment, @PathVariable("articleId") long articleId){
-
+    public ResponseEntity<CommentResponse> addComment(@RequestBody CommentDto request, @PathVariable("articleId") long articleId) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        if(authentication == null || !authentication.isAuthenticated()){
+        if (authentication == null || !authentication.isAuthenticated()) {
             throw new IllegalArgumentException("Not authenticated");
         }
 
-        String email = authentication.getName();
-        User user = userService.findByEmail(email);
-//        Long articleId = newComment.getArticleId();
+        User user = userService.findByEmail(authentication.getName());
         Article article = blogService.findById(articleId);
-
-        Comment comment = Comment.builder()
-                .content(newComment.getContent())
-                .user(user)
-                .article(article)
-                .build();
-        Comment savedComment = commentService.save(comment);
-        return ResponseEntity.status(HttpStatus.CREATED).body(new CommentResponse(savedComment, user.getId()));
-
+        CommentResponse comment = commentService.createComment(request.getContent(), article, user, request.getParentId());
+        return ResponseEntity.status(HttpStatus.CREATED).body(comment);
     }
 
     @GetMapping("/api/articles/{articleId}/comments")
     public ResponseEntity<List<CommentResponse>> findAllComments(@PathVariable("articleId") long articleId) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String email = authentication.getName();
-        User user = userService.findByEmail(email);
-        Long currentUserId = user.getId();
-        List<CommentResponse> comments = commentService.findAll(articleId)
+        User user = userService.findByEmail(authentication.getName());
+        List<CommentResponse> comments = commentService.findAllByArticleId(articleId, user.getId());
+                /*List<CommentResponse> comments = commentService.findAllByArticleId(articleId, user.getId())
                 .stream().map(comment -> new CommentResponse(comment, currentUserId)).toList();
-        /* commentService.findAll(articleId)로부터 Comment 리스트를 받아, 
+         commentService.findAll(articleId)로부터 Comment 리스트를 받아,
         각 Comment 객체를 CommentResponse 객체로 변환하여 새로운 리스트를 생성하는 역할을 함 */
 
 //        return ResponseEntity.ok().body(comments); 아래처럼 직관적으로 쓸 것
-          return ResponseEntity.ok(comments);
-
+        return ResponseEntity.ok(comments);
     }
 
-    @PutMapping("api/articles/{articleId}/comments/{commentId}")
+    @PutMapping("/api/articles/{articleId}/comments/{commentId}")
     public ResponseEntity<CommentResponse> updateComment(
-            @PathVariable("articleId") long ai, @PathVariable("commentId") long ci,
+            @PathVariable("articleId") long ai,
+            @PathVariable("commentId") long ci,
             @RequestBody CommentDto comment) {
         String content = comment.getContent();
         CommentResponse updatedComment = commentService.updateComment(ai, ci, content);
@@ -84,6 +72,5 @@ public class CommentApiController {
         commentService.deleteComment(articleId, commentId);
         return ResponseEntity.noContent().build();
     }
-
 }
 
