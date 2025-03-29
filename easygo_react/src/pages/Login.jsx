@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import googleLogo from '../assets/img/google.png';
 import './Login.scss';
+import useUserStore from '../store/userStore';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -9,6 +10,7 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const setNickname = useUserStore((state) => state.setNickname);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -37,10 +39,21 @@ const Login = () => {
         throw new Error(data || '로그인에 실패했습니다.');
       }
 
+      // JWT 토큰을 localStorage에 저장
+      if (data.jwtToken) {
+        localStorage.setItem('access_token', data.jwtToken);
+        // 사용자 닉네임을 store에 저장
+        if (data.user && data.user.nickname) {
+          setNickname(data.user.nickname);
+        }
+        // 로그인 성공 시 preferences 페이지로 직접 이동
+        navigate('/preferences');
+      } else {
+        throw new Error('토큰이 없습니다.');
+      }
+
       // 로그인 성공
       console.log('로그인 성공:', data);
-      // 로그인 성공 시 메인 페이지로 이동
-      navigate('/preferences');
       
     } catch (error) {
       console.error('Error:', error);
