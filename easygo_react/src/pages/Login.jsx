@@ -23,11 +23,7 @@ const Login = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        credentials: 'include',
-        body: JSON.stringify({
-          email: email,
-          password: password
-        })
+        body: JSON.stringify({ email, password }),
       });
 
       const data = await response.json();
@@ -42,10 +38,8 @@ const Login = () => {
       // JWT 토큰을 localStorage에 저장
       if (data.jwtToken) {
         localStorage.setItem('access_token', data.jwtToken);
-        // 사용자 닉네임을 store에 저장
-        if (data.user && data.user.nickname) {
-          setNickname(data.user.nickname);
-        }
+        // 사용자 정보 저장
+        useUserStore.getState().setUserInfo(data.user);
         // 로그인 성공 시 preferences 페이지로 직접 이동
         navigate('/preferences');
       } else {
@@ -56,7 +50,7 @@ const Login = () => {
       console.log('로그인 성공:', data);
       
     } catch (error) {
-      console.error('Error:', error);
+      console.error('Login failed:', error);
       setError(error.message || '로그인 중 오류가 발생했습니다.');
     } finally {
       setIsLoading(false);

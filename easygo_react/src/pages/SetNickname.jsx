@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import api from '../api/axios';  // api 인스턴스 import
+import useUserStore from '../store/userStore';
 import './SetNickname.scss';
 
 const SetNickname = () => {
   const [nickname, setNickname] = useState('');
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const location = useLocation();
+  const setUserInfo = useUserStore(state => state.setUserInfo);
 
   // 초기화 함수를 별도로 분리
   const initializeToken = () => {
@@ -22,6 +25,28 @@ const SetNickname = () => {
   useEffect(() => {
     initializeToken();
   }, []); // 빈 의존성 배열
+
+  useEffect(() => {
+    const token = new URLSearchParams(location.search).get('token');
+    if (token) {
+      localStorage.setItem('access_token', token);
+      
+      // 토큰 저장 후 사용자 정보 가져오기
+      fetch('/api/user/me', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      })
+      .then(response => response.json())
+      .then(user => {
+        setUserInfo({
+          email: user.email,
+          nickname: user.nickname || ''  // 닉네임이 없을 수 있으므로 빈 문자열 기본값 설정
+        });
+      })
+      .catch(error => console.error('Failed to fetch user info:', error));
+    }
+  }, [location, setUserInfo]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -39,6 +64,10 @@ const SetNickname = () => {
         console.log('닉네임 설정 성공');
         localStorage.setItem('user_nickname', nickname);
         navigate('/preferences');
+        setUserInfo(prevState => ({
+          ...prevState,
+          nickname: nickname
+        }));
         return; // 여기서 완전히 종료
       }
     } catch (error) {

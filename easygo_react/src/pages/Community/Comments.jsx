@@ -1,27 +1,30 @@
 import React, { useState, useEffect } from 'react';
 import api from '../../api/axios';
 import './Comments.scss';
+import useUserStore from '../../store/userStore';
 
 const Comments = ({ articleId }) => {
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState('');
   const [openReplies, setOpenReplies] = useState(new Set());
 
+  // articleId가 변경될 때마다 comments를 초기화하고 다시 불러오기
+  useEffect(() => {
+    setComments([]); // comments 초기화
+    if (articleId) {
+      fetchComments();
+    }
+  }, [articleId]); // articleId 의존성 추가
+
   const fetchComments = async () => {
     try {
       const response = await api.get(`/api/articles/${articleId}/comments`);
-      console.log('Fetched comments:', response.data);
+      console.log(`Fetching comments for article ${articleId}:`, response.data);
       setComments(response.data);
     } catch (error) {
       console.error('Failed to fetch comments:', error);
     }
   };
-
-  useEffect(() => {
-    if (articleId) {
-      fetchComments();
-    }
-  }, [articleId]);
 
   // 댓글 작성
   const handleCommentSubmit = async (e) => {
@@ -76,15 +79,15 @@ const Comments = ({ articleId }) => {
       });
       
       setComments(prevComments => 
-        prevComments.map(comment => {
+        prevComments.map(comment => { // 이전 상태 prevComments는 댓글 목록 배열
           if (comment.id === commentId) {
             return {
-              ...comment,
-              content: newContent,
-              isEdited: true
+              ...comment, // 기존 comment 객체를 펼쳐(...comment) 복사한 뒤,
+              content: newContent, // content만 newContent로 덮어씌우고
+              isEdited: true // isEdited: true를 추가하여 **"수정됨 표시"**를 함함
             };
           }
-          if (comment.children) {
+          if (comment.children) { // comment.children이 존재하면 → 대댓글을 가진 부모 댓글입니다.
             return {
               ...comment,
               children: comment.children.map(reply => 
@@ -121,9 +124,10 @@ const Comments = ({ articleId }) => {
     const [isEditing, setIsEditing] = useState(false);
     const [editContent, setEditContent] = useState(comment.content);
     
-    // 현재 로그인한 사용자 ID와 댓글 작성자 ID 비교
-    const currentUserId = 1; // 실제로는 로그인 사용자 ID를 받아와야 함
-    const isAuthor = comment.userId === currentUserId;
+    const { id } = useUserStore();
+    console.log('Current user id:', id);
+    console.log('Full comment object:', comment);
+    const isAuthor = id === comment.userid;  // userId -> userid로 수정
 
     const replyCount = children?.length || 0;
 
@@ -134,21 +138,12 @@ const Comments = ({ articleId }) => {
             <span className="nickname">{comment.nickname}</span>
             <span className="date">{new Date(comment.createdAt).toLocaleString()}</span>
           </div>
-          {/* 수정/삭제 버튼을 우측에 배치 */}
-          <div className="comment-buttons">
-            <button 
-              className="edit-btn"
-              onClick={() => setIsEditing(true)}
-            >
-              수정
-            </button>
-            <button 
-              className="delete-btn"
-              onClick={() => handleCommentDelete(comment.id)}
-            >
-              삭제
-            </button>
-          </div>
+          {isAuthor && (
+            <div className="comment-buttons">
+              <button className="edit-btn" onClick={() => setIsEditing(true)}>수정</button>
+              <button className="delete-btn" onClick={() => handleCommentDelete(comment.id)}>삭제</button>
+            </div>
+          )}
         </div>
         
         {isEditing ? (
@@ -195,7 +190,11 @@ const Comments = ({ articleId }) => {
                       className="view-replies-btn"
                       onClick={() => toggleReplies(comment.id)}
                     >
-                      {openReplies.has(comment.id) ? '답글 숨기기' : '답글 보기'}
+                      {openReplies.has(comment.id) ? (
+                        <span>답글 숨기기 <span className="reply-count">({replyCount})</span></span>
+                      ) : (
+                        <span>답글 {replyCount}</span>
+                      )}
                     </button>
                   )}
                   <button 
@@ -260,20 +259,15 @@ const Comments = ({ articleId }) => {
 
   // 댓글 목록 렌더링
   const renderComments = () => {
-    return comments.map(comment => {
-      // children이 있는 최상위 댓글만 렌더링
-      if (comment.children) {
-        return (
-          <div key={comment.id} className="comment-thread">
-            <CommentItem 
-              comment={comment} 
-              children={comment.children}
-            />
-          </div>
-        );
-      }
-      return null;
-    });
+    // 모든 최상위 댓글을 렌더링 (이미 백엔드에서 현재 게시글의 댓글만 보내줌)
+    return comments.map(comment => (
+      <div key={comment.id} className="comment-thread">
+        <CommentItem 
+          comment={comment}
+          children={comment.children || []}
+        />
+      </div>
+    ));
   };
 
   return (

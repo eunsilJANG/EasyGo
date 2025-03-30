@@ -3,44 +3,50 @@ import { useParams, useNavigate } from 'react-router-dom';
 import api, { IMAGE_BASE_URL } from '../../api/axios';
 import './ArticleDetail.scss';
 import Comments from './Comments';
+import useUserStore from '../../store/userStore';
 
 const ArticleDetail = () => {
   const [article, setArticle] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [editForm, setEditForm] = useState({ title: '', content: '' });
   const [loading, setLoading] = useState(true);
-  const { id } = useParams();
+  const { id, email } = useUserStore();
   const navigate = useNavigate();
   const [files, setFiles] = useState([]);
   const [previewUrls, setPreviewUrls] = useState([]);
   const [existingFiles, setExistingFiles] = useState([]);
+  const { id: articleId } = useParams();
 
   useEffect(() => {
-    fetchArticle();
-  }, [id]);
+    const fetchData = async () => {
+      try {
+        console.log('현재 로그인한 사용자 email:', email);
+        const response = await api.get(`/api/articles/${articleId}`);
+        console.log('게시글 데이터:', response.data);
+        console.log('게시글 작성자 정보:', response.data.user);
+        console.log('현재 사용자 ID:', id);
+        
+        setArticle(response.data);
+        setEditForm({
+          title: response.data.title,
+          content: response.data.content
+        });
+        setExistingFiles(response.data.fileUrls || []);
+        setLoading(false);
+      } catch (error) {
+        console.error('Error:', error);
+        alert('게시글을 불러오는데 실패했습니다.');
+        navigate('/community');
+      }
+    };
 
-  const fetchArticle = async () => {
-    try {
-      const response = await api.get(`/api/articles/${id}`);
-      console.log('Article data:', response.data); // 데이터 확인용
-      setArticle(response.data);
-      setEditForm({
-        title: response.data.title,
-        content: response.data.content
-      });
-      setExistingFiles(response.data.fileUrls || []);
-      setLoading(false);
-    } catch (error) {
-      console.error('Error:', error);
-      alert('게시글을 불러오는데 실패했습니다.');
-      navigate('/community');
-    }
-  };
+    fetchData();
+  }, [articleId, email, id]);
 
   const handleDelete = async () => {
     if (!window.confirm('정말로 이 게시글을 삭제하시겠습니까?')) return;
     try {
-      await api.delete(`/api/articles/${id}`);
+      await api.delete(`/api/articles/${articleId}`);
       alert('게시글이 삭제되었습니다.');
       navigate('/community');
     } catch (error) {
@@ -77,26 +83,23 @@ const ArticleDetail = () => {
     try {
       const formData = new FormData();
       
-      // 수정된 게시글 데이터
       const articleData = {
         title: editForm.title,
         content: editForm.content,
         fileUrls: existingFiles
       };
 
-      // article 데이터를 formData에 추가
       formData.append('article', new Blob([JSON.stringify(articleData)], {
         type: 'application/json'
       }));
 
-      // 새로운 파일들이 있다면 추가
       if (files.length > 0) {
         files.forEach(file => {
           formData.append('files', file);
         });
       }
 
-      await api.put(`/api/articles/${id}`, formData, {
+      await api.put(`/api/articles/${articleId}`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -105,13 +108,15 @@ const ArticleDetail = () => {
       alert('게시글이 수정되었습니다.');
       setIsEditing(false);
       await fetchArticle();
-      // 페이지 최상단으로 스크롤 이동
       window.scrollTo(0, 0);
     } catch (error) {
       console.error('Update error:', error);
       alert('게시글 수정에 실패했습니다.');
     }
   };
+
+  // isAuthor 체크를 userId로 변경
+  const isAuthor = article?.userId === id;  // 백엔드에서 보내는 필드명과 일치시킴
 
   if (loading) return <div className="loading">로딩 중...</div>;
   if (!article) return <div className="error">게시글을 찾을 수 없습니다.</div>;
@@ -196,7 +201,19 @@ const ArticleDetail = () => {
         ) : ( // 수정 모드가 아닐 때
           <div className="article-content">
             <div className="article-header">
-              <h1 className="title">{article.title}</h1>
+              <div className="title-container">
+                <h1 className="title">{article.title}</h1>
+                {isAuthor && (
+                  <div className="action-buttons">
+                    <button onClick={() => setIsEditing(true)} className="edit-btn">
+                      수정
+                    </button>
+                    <button onClick={handleDelete} className="delete-btn">
+                      삭제
+                    </button>
+                  </div>
+                )}
+              </div>
               <div className="article-meta">
                 <span className="author">{article.nickname}</span>
                 <span className="separator">·</span>
@@ -232,23 +249,17 @@ const ArticleDetail = () => {
               </div>
             )}
 
-            <div className="button-group">
-              <button onClick={() => navigate('/community')} className="back-btn">
-                목록으로
-              </button>
-              <div>
-                <button onClick={() => setIsEditing(true)} className="edit-btn">
-                  수정
-                </button>
-                <button onClick={handleDelete} className="delete-btn">
-                  삭제
+            {!isEditing && (
+              <div className="button-group">
+                <button onClick={() => navigate('/community')} className="back-btn">
+                  목록으로
                 </button>
               </div>
-            </div>
+            )}
           </div>
         )}
         
-        {!isEditing && <Comments articleId={id} />}
+        {!isEditing && <Comments articleId={articleId} />}
       </div>
     </div>
   );

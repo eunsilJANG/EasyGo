@@ -14,6 +14,7 @@ public class ArticleResponse {
     private final String title;
     private final String content;
     private final String nickname;
+    private final Long userId;
     private final LocalDateTime createdAt;
     private final List<String> fileUrls;
 
@@ -22,6 +23,7 @@ public class ArticleResponse {
         this.title = article.getTitle();
         this.content = article.getContent();
         this.nickname = article.getUser().getNickname();
+        this.userId = article.getUser().getId();
         this.createdAt = article.getCreatedAt();
         this.fileUrls = article.getFileUrls() != null ? article.getFileUrls() : new ArrayList<>();
     }

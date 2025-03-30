@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 
 import Header from './components/Layout/Header';
@@ -14,6 +14,7 @@ import Community from './pages/Community/ArticleList';
 import SetNickname from './pages/SetNickname';
 import WriteArticle from './pages/Community/WriteArticle';
 import ArticleDetail from './pages/Community/ArticleDetail';
+import useUserStore from './store/userStore';
 
 import './App.scss'; // 글로벌 스타일링
 
@@ -50,6 +51,14 @@ const AppLayout = () => {
 };
 
 const App = () => {
+  const fetchCurrentUser = useUserStore((state) => state.fetchCurrentUser);
+
+  useEffect(() => {
+    if (localStorage.getItem('access_token')) {
+      fetchCurrentUser();
+    }
+  }, []);
+
   return (
     <Router>
       <AppLayout />
