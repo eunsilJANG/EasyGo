@@ -21,7 +21,7 @@ const UserPreferences = () => {
     영유아: 0,
     반려견: 0
   });
-  const setNickname = useUserStore((state) => state.setNickname);
+  const setUserInfo = useUserStore((state) => state.setUserInfo);
 
   const regions = [
     { id: 'seoul', name: '서울' },
@@ -70,18 +70,26 @@ const UserPreferences = () => {
         if (response.data?.nickname) {
           localStorage.setItem('user_nickname', response.data.nickname);
           console.log('Nickname saved:', response.data.nickname);
-          setNickname(response.data.nickname);
+          setUserInfo(prevState => ({
+            ...prevState,
+            nickname: response.data.nickname
+          }));
+          
+          // 닉네임을 저장한 후 페이지 새로고침
+          window.location.reload();
         }
       } catch (error) {
         console.error('Error fetching user info:', error);
       }
     };
 
-    // 토큰이 있을 때만 사용자 정보 요청
-    if (tokenInUrl || localStorage.getItem('access_token')) {
+    // 첫 로드 시에만 실행되도록 플래그 확인
+    const isFirstLoad = sessionStorage.getItem('isFirstLoad') !== 'false';
+    if (isFirstLoad && (tokenInUrl || localStorage.getItem('access_token'))) {
+      sessionStorage.setItem('isFirstLoad', 'false'); // 플래그 업데이트
       fetchUserInfo();
     }
-  }, [setNickname, navigate, location.search]);
+  }, [setUserInfo, navigate, location.search]);
 
   return (
     <div className="page-container">

@@ -47,11 +47,14 @@ public class UserApiController {
     private static final String PREFERENCES_REDIRECT_PATH = "http://localhost:5173/preferences";
 
     @PostMapping("/user/nickname")
-    public ResponseEntity<Void> updateNickname(@RequestBody AddUserRequest request, Authentication authentication) {
+    public ResponseEntity<Void> updateNickname(@RequestBody Map<String, String> request, Authentication authentication) {
         String email = authentication.getName();
+        String nickname = request.get("nickname");
+        
         log.info("Received nickname update request for email: {}", email);
-        log.info("New nickname: {}", request.getNickname());
-        userService.updateNickname(request.getNickname(), email);
+        log.info("New nickname: {}", nickname);
+        
+        userService.updateNickname(nickname, email);
         return ResponseEntity.ok().build();
     }
 

@@ -53,22 +53,31 @@ const SetNickname = () => {
     if (!nickname.trim()) return;
 
     try {
-      // fetch 대신 api.post 사용
       const response = await api.post('/api/user/nickname', {
         nickname
       });
 
-      console.log('Response status:', response.status);
-
       if (response.status === 200) {
         console.log('닉네임 설정 성공');
         localStorage.setItem('user_nickname', nickname);
-        navigate('/preferences');
+        
+        // 상태 업데이트
         setUserInfo(prevState => ({
           ...prevState,
           nickname: nickname
         }));
-        return; // 여기서 완전히 종료
+
+        // localStorage에서 returnUrl 확인
+        const returnUrl = localStorage.getItem('returnUrl');
+        
+        if (returnUrl) {
+          // returnUrl이 있으면 해당 페이지로 이동하고 localStorage 클리어
+          localStorage.removeItem('returnUrl');
+          window.location.href = returnUrl;
+        } else {
+          // 처음 로그인하는 경우 preferences로 이동
+          navigate('/preferences');
+        }
       }
     } catch (error) {
       console.error('API 호출 실패:', error);
