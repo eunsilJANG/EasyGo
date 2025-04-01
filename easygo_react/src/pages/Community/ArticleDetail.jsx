@@ -16,32 +16,32 @@ const ArticleDetail = () => {
   const [previewUrls, setPreviewUrls] = useState([]);
   const [existingFiles, setExistingFiles] = useState([]);
   const { id: articleId } = useParams();
+  const [likecheck, setLikecheck] = useState(false);
+  const [commentCount, setCommentCount] = useState(0);
+
+  const fetchData = async () => {
+    try {
+      const response = await api.get(`/api/articles/${articleId}`);
+      console.log('상세 페이지 데이터:', response.data);
+      setArticle(response.data);
+      setEditForm({
+        title: response.data.title,
+        content: response.data.content
+      });
+      setExistingFiles(response.data.fileUrls || []);
+      setLikecheck(response.data.likecheck);
+      setCommentCount(response.data.commentCount || 0);
+      setLoading(false);
+    } catch (error) {
+      console.error('Error:', error);
+      alert('게시글을 불러오는데 실패했습니다.');
+      navigate('/community');
+    }
+  };
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        console.log('현재 로그인한 사용자 email:', email);
-        const response = await api.get(`/api/articles/${articleId}`);
-        console.log('게시글 데이터:', response.data);
-        console.log('게시글 작성자 정보:', response.data.user);
-        console.log('현재 사용자 ID:', id);
-        
-        setArticle(response.data);
-        setEditForm({
-          title: response.data.title,
-          content: response.data.content
-        });
-        setExistingFiles(response.data.fileUrls || []);
-        setLoading(false);
-      } catch (error) {
-        console.error('Error:', error);
-        alert('게시글을 불러오는데 실패했습니다.');
-        navigate('/community');
-      }
-    };
-
     fetchData();
-  }, [articleId, email, id]);
+  }, [articleId]);
 
   const handleDelete = async () => {
     if (!window.confirm('정말로 이 게시글을 삭제하시겠습니까?')) return;
@@ -107,11 +107,28 @@ const ArticleDetail = () => {
       
       alert('게시글이 수정되었습니다.');
       setIsEditing(false);
-      await fetchArticle();
+      await fetchData();
       window.scrollTo(0, 0);
     } catch (error) {
       console.error('Update error:', error);
       alert('게시글 수정에 실패했습니다.');
+    }
+  };
+
+  const handleLike = async () => {
+    try {
+      const response = await api.post(`/api/articles/${articleId}/like`);
+      console.log('좋아요 응답:', response.data);
+      
+      setLikecheck(response.data.likecheck);
+      
+      setArticle(prev => ({
+        ...prev,
+        likeCount: response.data.likeCount
+      }));
+    } catch (error) {
+      console.error('Error:', error);
+      alert('좋아요 처리에 실패했습니다.');
     }
   };
 
@@ -218,12 +235,16 @@ const ArticleDetail = () => {
                 <span className="author">{article.nickname}</span>
                 <span className="separator">·</span>
                 <span className="date">{new Date(article.createdAt).toLocaleString()}</span>
+                <span className="separator">·</span>
+                <span className="views">조회 {article.viewCount || 0}</span>
               </div>
             </div>
             
-            <div className="content">
-              {article.content}
-            </div>
+            {!isEditing && (
+              <div className="content">
+                {article.content}
+              </div>
+            )}
 
             {article.fileUrls && article.fileUrls.length > 0 && (
               <div className="file-section">
@@ -231,7 +252,6 @@ const ArticleDetail = () => {
                 <div className="file-list">
                   {article.fileUrls.map((url, index) => {
                     const fullUrl = `${IMAGE_BASE_URL}${url}`;
-                    console.log('Full image URL:', fullUrl); // 디버깅용
                     return (
                       <div key={index} className="file-item">
                         <img 
@@ -249,17 +269,40 @@ const ArticleDetail = () => {
               </div>
             )}
 
+            {/* 좋아요 표시 */}
             {!isEditing && (
-              <div className="button-group">
-                <button onClick={() => navigate('/community')} className="back-btn">
-                  목록으로
-                </button>
+              <div 
+                className={`like-display ${likecheck ? 'liked' : ''}`}
+                onClick={handleLike}
+              >
+                <span className="heart-icon">
+                  {likecheck ? '♥' : '♡'}
+                </span>
+                <span className="like-text">
+                  좋아요 {article.likeCount || 0}
+                </span>
+              </div>
+            )}
+
+            {!isEditing && (
+              <div className="comments-section">
+                <div className="comments-header">
+                  <div className="comments-title">
+                    <h3>댓글</h3>
+                    <span className="comment-count">{commentCount}</span>
+                  </div>
+                  <button onClick={() => navigate('/community')} className="back-btn">
+                    목록으로
+                  </button>
+                </div>
+                <Comments 
+                  articleId={articleId} 
+                  onCommentCountChange={count => setCommentCount(count)}
+                />
               </div>
             )}
           </div>
         )}
-        
-        {!isEditing && <Comments articleId={articleId} />}
       </div>
     </div>
   );

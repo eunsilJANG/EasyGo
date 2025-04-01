@@ -3,11 +3,14 @@ package me.eunsil.springbootdeveloper.service;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import me.eunsil.springbootdeveloper.domain.Article;
+import me.eunsil.springbootdeveloper.domain.ArticleLike;
 import me.eunsil.springbootdeveloper.domain.User;
 import me.eunsil.springbootdeveloper.dto.AddArticleRequest;
 import me.eunsil.springbootdeveloper.dto.UpdateArticleRequest;
 import me.eunsil.springbootdeveloper.repository.BlogRepository;
+import me.eunsil.springbootdeveloper.repository.ArticleLikeRepository;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.repository.query.Param;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -30,6 +33,7 @@ import lombok.extern.slf4j.Slf4j;
 public class BlogService {
 
     private final BlogRepository blogRepository;
+    private final ArticleLikeRepository articleLikeRepository;
 
     @Value("${file.upload.directory}")  // application.properties에서 설정
     private String uploadDirectory;
@@ -155,5 +159,42 @@ public class BlogService {
         if (file.exists()) {
             file.delete();
         }
+    }
+
+    @Transactional
+    public void incrementViewCount(Long articleId) {
+        Article article = blogRepository.findById(articleId)
+                .orElseThrow(() -> new IllegalArgumentException("게시글이 존재하지 않습니다."));
+        article.incrementViewCount();
+        blogRepository.save(article);
+    }
+
+    @Transactional
+    public boolean toggleLike(Long articleId, User user) {
+        Article article = findById(articleId);
+
+        // 이미 좋아요를 눌렀는지 확인
+        boolean hasLiked = articleLikeRepository.existsByArticleIdAndUserId(article.getId(), user.getId());
+
+
+        if (hasLiked) {
+            // 좋아요 취소
+            articleLikeRepository.deleteByArticleAndUser(article, user);
+            article.decrementLikeCount();
+            return false;
+        } else {
+            // 좋아요 추가
+            ArticleLike articleLike = ArticleLike.builder()
+                .article(article)
+                .user(user)
+                .build();
+            articleLikeRepository.save(articleLike);
+            article.incrementLikeCount();
+            return true;
+        }
+    }
+
+    public boolean hasUserLikedArticle(Long articleId, Long userId) {
+        return articleLikeRepository.existsByArticleIdAndUserId(articleId, userId);
     }
 }

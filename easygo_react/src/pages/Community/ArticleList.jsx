@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import api from '../../api/axios';  // 수정
+import { useNavigate } from 'react-router-dom';
+import api from '../../api/axios';
 import './ArticleList.scss';
 
 const Community = () => {
@@ -9,87 +9,63 @@ const Community = () => {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
-  // 로그인 상태 확인
-  const isLoggedIn = () => {
-    return localStorage.getItem('access_token') !== null;  
-  };
-
-  // 글쓰기 버튼 클릭 핸들러
-  const handleWriteClick = () => {
-    if (!isLoggedIn()) {
-      alert('로그인이 필요한 서비스입니다.');
-      navigate('/login');
-      return;
+  const fetchArticles = async () => {
+    try {
+      const response = await api.get('/api/articles');
+      setArticles(response.data);
+      setLoading(false);
+    } catch (error) {
+      console.error('Error fetching articles:', error);
+      setError('게시글을 불러오는데 실패했습니다.');
+      setLoading(false);
     }
-    navigate('/community/write');
-  };
+  }
 
   useEffect(() => {
     fetchArticles();
   }, []);
 
-  const fetchArticles = async () => {
-    try {
-      // fetch 대신 api.get 사용
-      const response = await api.get('/api/articles');
-      
-      console.log('Response status:', response.status);
-      console.log('전체 데이터:', response.data);
-      console.log('첫 번째 게시글의 전체 필드:', response.data[0] ? Object.keys(response.data[0]) : '데이터 없음');
-      console.log('첫 번째 게시글:', response.data[0]);
-      
-      setArticles(response.data);
-    } catch (error) {
-      console.error('Error fetching articles:', error);
-      if (error.response?.status === 401) {
-        navigate('/login');
-        setError('로그인이 필요한 서비스입니다.');
-      } else {
-        setError('게시글을 불러오는데 실패했습니다.');
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
+  const handleBackToList = () => {
+    fetchArticles();
+  }
 
-  // 날짜 포맷팅 함수 더 단순하게
   const formatDate = (dateString) => {
     if (!dateString) return '';
     const date = new Date(dateString);
     const now = new Date();
-    const diffTime = Math.floor((now - date) / 1000); // 초 단위 차이
+    const diffTime = Math.floor((now - date) / 1000);
 
-    // 1분 이내
-    if (diffTime < 60) {
-      return '방금 전';
-    }
+    if (diffTime < 60) return '방금 전';
+    if (diffTime < 3600) return `${Math.floor(diffTime / 60)}분 전`;
+    if (diffTime < 86400) return `${Math.floor(diffTime / 3600)}시간 전`;
+    if (diffTime < 604800) return `${Math.floor(diffTime / 86400)}일 전`;
     
-    // 1시간 이내
-    if (diffTime < 3600) {
-      const minutes = Math.floor(diffTime / 60);
-      return `${minutes}분 전`;
-    }
-    
-    // 24시간 이내
-    if (diffTime < 86400) {
-      const hours = Math.floor(diffTime / 3600);
-      return `${hours}시간 전`;
-    }
-    
-    // 7일 이내
-    if (diffTime < 604800) {
-      const days = Math.floor(diffTime / 86400);
-      return `${days}일 전`;
-    }
-    
-    // 7일 이후
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const day = String(date.getDate()).padStart(2, '0');
-    const hours = String(date.getHours()).padStart(2, '0');
-    const minutes = String(date.getMinutes()).padStart(2, '0');
-    
-    return `${year}.${month}.${day} ${hours}:${minutes}`;
+    return `${year}.${month}.${day}`;
+  }
+
+  const handleArticleClick = async (articleId) => {
+    try {
+      // 1. 조회수 증가 및 업데이트된 게시글 정보 받기
+      const response = await api.post(`/api/articles/${articleId}/view`);
+      
+      // 2. 게시글 목록 업데이트
+      setArticles(prevArticles => 
+        prevArticles.map(article => 
+          article.id === articleId 
+            ? { ...article, viewCount: response.data.viewCount }
+            : article
+        )
+      );
+
+      // 3. 상세 페이지로 이동
+      navigate(`/community/articles/${articleId}`);
+    } catch (error) {
+      console.error('Error:', error);
+      navigate(`/community/articles/${articleId}`);
+    }
   };
 
   if (loading) return <div className="loading">로딩 중...</div>;
@@ -100,38 +76,38 @@ const Community = () => {
       <div className="community-container">
         <div className="header">
           <h1>커뮤니티</h1>
-          <button onClick={handleWriteClick} className="write-button">
+          <button onClick={() => navigate('/community/write')} className="write-button">
             글쓰기
           </button>
         </div>
 
         <div className="post-list">
-          {articles.length === 0 ? (
-            <div className="no-posts">
-              아직 게시글이 없습니다. 첫 게시글을 작성해보세요!
+          {articles.map((article) => (
+            <div 
+              key={article.id} 
+              className="post-item"
+              onClick={() => handleArticleClick(article.id)}
+              style={{ cursor: 'pointer' }}
+            >
+              <div className="post-info">
+                <div className="post-title">{article.title}</div>
+                <div className="post-meta">
+                  <span className="author">{article.nickname}</span>
+                  <span className="separator">•</span>
+                  <span className="date">{formatDate(article.createdAt)}</span>
+                  <span className="separator">•</span>
+                  <span className="views">조회수 {article.viewCount ?? 0}</span>
+                  <span className="separator">•</span>
+                  <span className="likes">좋아요 {article.likeCount ?? 0}</span>
+                </div>
+              </div>
             </div>
-          ) : (
-            articles.map((article) => (
-              <Link to={`/community/articles/${article.id}`} key={article.id} className="post-item">
-                <div className="post-info">
-                  <div className="post-title">{article.title}</div>
-                  <div className="post-meta">
-                    <span className="author">{article.nickname}</span>
-                    <span className="separator">•</span>
-                    <span className="date">{formatDate(article.createdAt)}</span>
-                  </div>
-                </div>
-                <div className="post-preview">
-                  {article.content}
-                </div>
-              </Link>
-            ))
-          )}
+          ))}
         </div>
       </div>
     </div>
   );
-};
+}
 
 export default Community;
 

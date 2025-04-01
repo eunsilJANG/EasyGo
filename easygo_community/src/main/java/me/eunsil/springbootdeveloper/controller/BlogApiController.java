@@ -8,6 +8,7 @@ import me.eunsil.springbootdeveloper.dto.AddArticleRequest;
 import me.eunsil.springbootdeveloper.dto.ArticleListViewResponse;
 import me.eunsil.springbootdeveloper.dto.ArticleResponse;
 import me.eunsil.springbootdeveloper.dto.UpdateArticleRequest;
+import me.eunsil.springbootdeveloper.repository.ArticleLikeRepository;
 import me.eunsil.springbootdeveloper.service.BlogService;
 import me.eunsil.springbootdeveloper.service.UserService;
 import org.springframework.http.HttpStatus;
@@ -21,7 +22,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.security.Principal;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 @Slf4j
 @RequiredArgsConstructor
 @RestController // HTTP Response Body에 객체 데이터를 JSON 형식으로 반환하는 컨트롤러
@@ -29,6 +32,7 @@ public class BlogApiController {
 
     private final BlogService blogService;
     private final UserService userService;
+    private final ArticleLikeRepository articleLikeRepository;
 
     @PostMapping("/api/articles")
     public ResponseEntity<Article> addArticle(
@@ -89,12 +93,27 @@ public class BlogApiController {
     }
 
     @GetMapping("/api/articles/{id}")
-    public ResponseEntity<ArticleResponse> findArticle(@PathVariable("id") long id){
+    public ResponseEntity<ArticleResponse> findArticle(@PathVariable("id") Long id) {
         Article article = blogService.findById(id);
-
-        log.info("File URLs: {}", article.getFileUrls());   
-
-        return ResponseEntity.ok().body(new ArticleResponse(article));
+        
+        // 현재 로그인한 사용자의 좋아요 상태 확인
+        boolean likecheck = false;
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        
+        // 인증된 사용자인 경우에만 좋아요 상태 확인
+        if (authentication != null && authentication.isAuthenticated() 
+                && !authentication.getPrincipal().equals("anonymousUser")) {
+            String email = authentication.getName();
+            User user = userService.findByEmail(email);
+            // articleId와 userId로 좋아요 상태 확인
+            likecheck = articleLikeRepository.existsByArticleIdAndUserId(article.getId(), user.getId());
+            
+            // 디버깅을 위한 로그 추가
+            log.info("Article ID: {}, User ID: {}, LikeCheck: {}", article.getId(), user.getId(), likecheck);
+        }
+        
+        return ResponseEntity.ok()
+                .body(new ArticleResponse(article, likecheck));
     }
 
     @DeleteMapping("/api/articles/{id}")
@@ -113,5 +132,37 @@ public class BlogApiController {
         Article updatedArticle = blogService.update(id, request, files);
         return ResponseEntity.ok()
             .body(updatedArticle);
+    }
+
+    @PostMapping("/api/articles/{articleId}/view")
+    public ResponseEntity<ArticleResponse> incrementViewCount(@PathVariable("articleId") Long articleId) {
+        // 조회수 증가
+        blogService.incrementViewCount(articleId);
+        
+        // 업데이트된 게시글 정보 반환
+        Article article = blogService.findById(articleId);
+        return ResponseEntity.ok()
+            .body(new ArticleResponse(article, false));  // 조회수 API에서는 좋아요 상태는 불필요하므로 false로 설정
+    }
+
+    @PostMapping("/api/articles/{articleId}/like")
+    public ResponseEntity<Map<String, Object>> toggleLike(@PathVariable("articleId") Long articleId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        String email = authentication.getName();
+        User user = userService.findByEmail(email);
+        
+        boolean likecheck = blogService.toggleLike(articleId, user);
+        Article article = blogService.findById(articleId);
+        
+        Map<String, Object> response = new HashMap<>();
+        response.put("likecheck", likecheck);
+        response.put("likeCount", article.getLikeCount());
+        
+        return ResponseEntity.ok(response);
     }
 }

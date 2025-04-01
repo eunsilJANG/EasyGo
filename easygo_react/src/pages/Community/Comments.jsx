@@ -3,7 +3,7 @@ import api from '../../api/axios';
 import './Comments.scss';
 import useUserStore from '../../store/userStore';
 
-const Comments = ({ articleId }) => {
+const Comments = ({ articleId, onCommentCountChange }) => {
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState('');
   const [openReplies, setOpenReplies] = useState(new Set());
@@ -21,6 +21,7 @@ const Comments = ({ articleId }) => {
       const response = await api.get(`/api/articles/${articleId}/comments`);
       console.log(`Fetching comments for article ${articleId}:`, response.data);
       setComments(response.data);
+      onCommentCountChange(response.data.length); // 댓글 수를 부모 컴포넌트로 전달
     } catch (error) {
       console.error('Failed to fetch comments:', error);
     }

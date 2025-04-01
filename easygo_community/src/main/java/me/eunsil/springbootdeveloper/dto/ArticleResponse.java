@@ -17,8 +17,11 @@ public class ArticleResponse {
     private final Long userId;
     private final LocalDateTime createdAt;
     private final List<String> fileUrls;
+    private final Long viewCount;
+    private final Long likeCount;
+    private boolean likecheck;  // liked에서 likecheck로 변경
 
-    public ArticleResponse(Article article) {
+    public ArticleResponse(Article article, boolean likecheck) {  // 파라미터 이름 변경
         this.id = article.getId();
         this.title = article.getTitle();
         this.content = article.getContent();
@@ -26,5 +29,17 @@ public class ArticleResponse {
         this.userId = article.getUser().getId();
         this.createdAt = article.getCreatedAt();
         this.fileUrls = article.getFileUrls() != null ? article.getFileUrls() : new ArrayList<>();
+        this.viewCount = article.getViewCount();
+        this.likeCount = article.getLikeCount();
+        this.likecheck = likecheck;  // 변수명 변경
+    }
+
+    // 기존 생성자도 유지 (isLiked를 false로 기본 설정)
+    public ArticleResponse(Article article) {
+        this(article, false);
+    }
+
+    public boolean getLikecheck() {  // getLiked에서 getLikecheck로 변경
+        return likecheck;
     }
 }

@@ -53,8 +53,17 @@ public class Article {
     @Column(name = "file_url")
     private List<String> fileUrls = new ArrayList<>();  // 파일 URL 목록
 
+    @Column(columnDefinition = "bigint default 0")
+    private Long viewCount = 0L;
+
+    @Column(name = "like_count", columnDefinition = "bigint default 0")
+    private Long likeCount = 0L;
+
+    @OneToMany(mappedBy = "article", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ArticleLike> likes = new ArrayList<>();
+
     @Builder(toBuilder = true)
-    public Article(String title, String content, User user, LocalDateTime createdAt, LocalDateTime updatedAt, List<String> fileUrls) {
+    public Article(String title, String content, User user, LocalDateTime createdAt, LocalDateTime updatedAt, List<String> fileUrls, Long viewCount, Long likeCount) {
         this.title = title;
         this.content = content;
         this.user = user;
@@ -63,6 +72,8 @@ public class Article {
         if (fileUrls != null) {
             this.fileUrls = fileUrls;
         }
+        this.viewCount = viewCount != null ? viewCount : 0L;
+        this.likeCount = likeCount != null ? likeCount : 0L;
     }
 
 //    클래스 위에 @Builder: 클래스의 모든 생성자에 대해 빌더 패턴을 자동으로 적용합니다.
@@ -80,5 +91,20 @@ public class Article {
     // fileUrls setter 메서드 추가
     public void setFileUrls(List<String> fileUrls) {
         this.fileUrls = fileUrls;
+    }
+
+    // 조회수 증가
+    public void incrementViewCount() {
+        this.viewCount = this.viewCount + 1;
+    }
+
+    // 좋아요 수 증가
+    public void incrementLikeCount() {
+        this.likeCount = this.likeCount + 1;
+    }
+
+    // 좋아요 수 감소
+    public void decrementLikeCount() {
+        this.likeCount = Math.max(0, this.likeCount - 1);
     }
 }
