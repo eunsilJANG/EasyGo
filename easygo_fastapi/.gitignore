@@ -1,0 +1,9 @@
+.env
+.env.local
+.env.development
+.env.production
+.env.test
+
+# Python 컴파일 결과물
+__pycache__/
+*.py[cod]

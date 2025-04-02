@@ -14,6 +14,7 @@ import Community from './pages/Community/ArticleList';
 import SetNickname from './pages/SetNickname';
 import WriteArticle from './pages/Community/WriteArticle';
 import ArticleDetail from './pages/Community/ArticleDetail';
+import TravelCourse from './pages/TravelCourse/TravelCourse';
 import useUserStore from './store/userStore';
 
 import './App.scss'; // 글로벌 스타일링
@@ -44,6 +45,7 @@ const AppLayout = () => {
         <Route path="/travel" element={<div>Travel Page</div>} />
         <Route path="/mypage" element={<div>MyPage</div>} />
         <Route path="/wish" element={<div>Wish Page</div>} />
+        <Route path="/travel-course" element={<TravelCourse />} />
       </Routes>
       {showHeaderFooter && <Footer />}
     </div>

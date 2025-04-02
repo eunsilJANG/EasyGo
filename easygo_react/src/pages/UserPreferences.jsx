@@ -5,7 +5,7 @@ import { ko } from 'date-fns/locale';
 import "react-datepicker/dist/react-datepicker.css";
 import './UserPreferences.scss';
 import useUserStore from '../store/userStore';
-import api from '../api/axios';  // api 인스턴스 import 추가
+import { api, aiApi } from '../api/axios';
 
 const UserPreferences = () => {
   const navigate = useNavigate();
@@ -91,6 +91,53 @@ const UserPreferences = () => {
     }
   }, [setUserInfo, navigate, location.search]);
 
+  const onSavePreferences = async () => {
+    try {
+      // 날짜를 YYYY-MM-DD 형식으로 변환
+      const formatDate = (date) => {
+        return date.toISOString().split('T')[0];
+      };
+
+      // 선택된 데이터 수집
+      const preferences = {
+        region: selectedRegion,
+        startDate: formatDate(startDate),
+        endDate: formatDate(endDate),
+        ageGroup: selectedAge,
+        travelers: {
+          adult: travelers['성인'],
+          teen: travelers['청소년'],
+          child: travelers['어린이'],
+          infant: travelers['영유아'],
+          pet: travelers['반려견']
+        }
+      };
+
+      console.log("Sending preferences:", preferences);
+
+      const response = await aiApi.post('generate_course', preferences);
+      console.log("Received response:", response.data);
+
+      if (response.data) {
+        navigate('/travel-course', { 
+          state: { 
+            course: response.data 
+          } 
+        });
+      } else {
+        throw new Error('No data received from server');
+      }
+
+    } catch (error) {
+      console.error("Error generating course:", error);
+      if (error.response) {
+        console.error("Error status:", error.response.status);
+        console.error("Error data:", error.response.data);
+      }
+      alert('여행 코스 생성 중 오류가 발생했습니다. 다시 시도해주세요.');
+    }
+  };
+
   return (
     <div className="page-container">
       <div className="user-preferences">
@@ -115,6 +162,8 @@ const UserPreferences = () => {
         {/* 날짜 선택 섹션 */}
         <section className="date-section">
           <h3>여행 일정</h3>
+
+          
           <div className="date-display">
             <div className="calendar-container">
               <DatePicker
@@ -191,7 +240,9 @@ const UserPreferences = () => {
           </div>
         </section>
 
-        <button className="save-button">설정 완료</button>
+        <button className="save-button" onClick={onSavePreferences}>
+          설정 완료
+        </button>
       </div>
     </div>
   );

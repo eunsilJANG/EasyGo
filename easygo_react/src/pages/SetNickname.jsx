@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
-import api from '../api/axios';  // api 인스턴스 import
+import { api } from '../api/axios';
 import useUserStore from '../store/userStore';
 import './SetNickname.scss';
 

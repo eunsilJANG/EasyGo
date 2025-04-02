@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import api from '../../api/axios';  // 수정
+import { api } from "../../api/axios";
 import './WriteArticle.scss';
 
 const WriteArticle = () => {

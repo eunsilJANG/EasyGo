@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import api, { IMAGE_BASE_URL } from '../../api/axios';
+import { api, IMAGE_BASE_URL } from '../../api/axios';
 import './ArticleDetail.scss';
 import Comments from './Comments';
 import useUserStore from '../../store/userStore';
