@@ -8,11 +8,16 @@ $text-primary: #2D3436;
 $text-secondary: #636E72;
 
 .header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 9999;
+  background-color: white;
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 1.2rem 2rem;
-  background-color: white;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
 
   &__left {
@@ -124,4 +129,14 @@ $text-secondary: #636E72;
       }
     }
   }
+}
+
+body {
+  padding-top: 60px;
+}
+
+.community-page, .article-detail-page {
+  position: relative;
+  z-index: auto;
+  padding-top: 60px;
 } 

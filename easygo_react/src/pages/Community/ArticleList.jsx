@@ -73,21 +73,22 @@ const Community = () => {
 
   return (
     <div className="community-page">
-      <div className="community-container">
-        <div className="header">
+      <div className="community-header">
+        <div className="header-content">
           <h1>커뮤니티</h1>
           <button onClick={() => navigate('/community/write')} className="write-button">
             글쓰기
           </button>
         </div>
+      </div>
 
+      <div className="community-container">
         <div className="post-list">
           {articles.map((article) => (
             <div 
               key={article.id} 
               className="post-item"
               onClick={() => handleArticleClick(article.id)}
-              style={{ cursor: 'pointer' }}
             >
               <div className="post-info">
                 <div className="post-title">{article.title}</div>

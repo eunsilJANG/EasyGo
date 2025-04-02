@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { HiLink, HiMap, HiUser, HiHeart } from 'react-icons/hi';
+import { HiLink, HiMap, HiUser, HiChat } from 'react-icons/hi';
 import './Footer.scss';
 
 const Footer = () => {
@@ -10,7 +10,7 @@ const Footer = () => {
     { path: '/link', icon: HiLink, text: '링크' },
     { path: '/travel', icon: HiMap, text: '여행' },
     { path: '/mypage', icon: HiUser, text: '마이' },
-    { path: '/wish', icon: HiHeart, text: '찜' },
+    { path: '/community', icon: HiChat, text: '커뮤니티' },
   ];
 
   return (
