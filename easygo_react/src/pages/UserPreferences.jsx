@@ -11,8 +11,11 @@ const UserPreferences = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [selectedRegion, setSelectedRegion] = useState('');
-  const [startDate, setStartDate] = useState(new Date('2025-03-08'));
-  const [endDate, setEndDate] = useState(new Date('2025-03-09'));
+  const today = new Date();
+  const tomorrow = new Date(today);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  const [startDate, setStartDate] = useState(today);
+  const [endDate, setEndDate] = useState(tomorrow);
   const [selectedAges, setSelectedAges] = useState([]);
   const [travelers, setTravelers] = useState({
     성인: 0,

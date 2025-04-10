@@ -87,7 +87,6 @@ async def get_popular_places(region: str, category: str, areas: List[str]) -> Li
     
     async def process_query(query: str) -> List[dict]:
         unique_places = {}
-        
         try:
             async with aiohttp.ClientSession() as session:
                 headers = {
@@ -104,6 +103,7 @@ async def get_popular_places(region: str, category: str, areas: List[str]) -> Li
                 async with session.get(NAVER_LOCAL_API_URL, headers=headers, params=params) as response:
                     if response.status == 200:
                         data = await response.json()
+                        print(f"API Response for {query}:", data)
                         items = data.get("items", [])
                         
                         for item in items:
@@ -112,28 +112,34 @@ async def get_popular_places(region: str, category: str, areas: List[str]) -> Li
                                 road_address = item.get("roadAddress", "")
                                 address = road_address if road_address else item["address"]
                                 
-                                # 지역 필터링
-                                if region.lower() in address.lower():
+                                if any(area.lower() in address.lower() for area in [region, *areas]):
                                     unique_places[clean_title] = {
                                         "name": clean_title,
                                         "address": address,
                                         "category": category
                                     }
-                
+                    else:
+                        print(f"API Error for {query}: {response.status}")
+                        
         except Exception as e:
             print(f"Error processing query {query}: {e}")
+            print(f"Traceback: {traceback.format_exc()}")
         
         return list(unique_places.values())
     
     # 검색 쿼리 생성
     queries = []
     for area in areas:
+        area = area.strip()
         if category == "관광명소":
             queries.append(f"{region} {area} 관광지")
+            queries.append(f"{area} 명소")  # 대안 검색어 추가
         elif category == "음식점":
             queries.append(f"{area} 맛집")
+            queries.append(f"{area} 식당")  # 대안 검색어 추가
         else:  # 카페
             queries.append(f"{area} 카페")
+            queries.append(f"{area} 커피")  # 대안 검색어 추가
     
     # 병렬 처리
     tasks = [process_query(query) for query in queries]
@@ -340,6 +346,36 @@ def parse_generated_text(text: str, start_date: str, end_date: str, available_pl
 async def generate_travel_course(preferences: TravelPreference):
     try:
         print("\n=== Starting Travel Course Generation ===")
+        print(f"Received preferences: {preferences.dict()}")  # 로그 추가
+        
+        # 지역명 정규화
+        region = preferences.region.strip()
+        areas = [area.strip() for area in preferences.areas]
+        
+        # 지역명이 한글이 아닌 경우 처리
+        if not re.match(r'^[가-힣\s]+$', region):
+            raise HTTPException(status_code=400, detail="Invalid region name")
+            
+        # 빈 지역 리스트 체크
+        if not areas:
+            raise HTTPException(status_code=400, detail="No areas specified")
+
+        # 장소 검색
+        tourist_spots = await get_popular_places(region, "관광명소", areas)
+        print(f"Found {len(tourist_spots)} tourist spots")  # 로그 추가
+        
+        restaurants = await get_popular_places(region, "음식점", areas)
+        print(f"Found {len(restaurants)} restaurants")  # 로그 추가
+        
+        cafes = await get_popular_places(region, "카페", areas)
+        print(f"Found {len(cafes)} cafes")  # 로그 추가
+
+        if not tourist_spots and not restaurants and not cafes:
+            raise HTTPException(
+                status_code=404, 
+                detail=f"No places found for region '{region}' and areas {areas}"
+            )
+
         start_date = preferences.startDate.split('T')[0]
         end_date = preferences.endDate.split('T')[0]
         
