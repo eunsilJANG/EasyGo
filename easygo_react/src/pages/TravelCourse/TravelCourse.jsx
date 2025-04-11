@@ -170,6 +170,36 @@ const TravelCourse = () => {
     }
   };
 
+  const handleSpotDelete = (dayIndex, spotIndex) => {
+    if (!window.confirm('이 장소를 일정에서 삭제하시겠습니까?')) {
+      return;
+    }
+
+    const newData = { ...courseData };
+    const newDays = [...newData.days];
+    const daySpots = [...newDays[dayIndex].spots];
+    
+    // 해당 스팟 삭제
+    daySpots.splice(spotIndex, 1);
+    
+    // 남은 스팟들의 시간 재배치
+    if (daySpots.length > 0) {
+      const startMinutes = 8 * 60;  // 오전 8시 시작
+      const gap = Math.floor((12 * 60) / Math.max(1, daySpots.length - 1));  // 12시간 동안 균등 분배
+      
+      daySpots.forEach((spot, index) => {
+        const minutes = startMinutes + (gap * index);
+        const hours = Math.floor(minutes / 60);
+        const mins = minutes % 60;
+        spot.time = `${String(hours).padStart(2, '0')}:${String(mins).padStart(2, '0')}`;
+      });
+    }
+
+    newDays[dayIndex].spots = daySpots;
+    setIsModified(true);
+    setCourseData({ ...newData, days: newDays });
+  };
+
   return (
     <div className="travel-course">
       <div className="course-header">
@@ -293,6 +323,18 @@ const TravelCourse = () => {
                                   <p className="description">{spot.description}</p>
                                 )}
                               </div>
+                              {isEditMode && (
+                                <button 
+                                  className="delete-spot-button"
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    handleSpotDelete(dayIndex, spotIndex);
+                                  }}
+                                >
+                                  ×
+                                </button>
+                              )}
                             </div>
                           </div>
                         )}
