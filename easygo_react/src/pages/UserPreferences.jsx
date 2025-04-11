@@ -109,42 +109,59 @@ const UserPreferences = () => {
     const params = new URLSearchParams(location.search);
     const tokenInUrl = params.get('token');
     
-    // 1. URL에 토큰이 있으면 저장
+    // 토큰이 URL에 있을 때의 처리
     if (tokenInUrl) {
-      console.log('New token from URL:', tokenInUrl);
+      console.log('Token received:', tokenInUrl);
       localStorage.setItem('access_token', tokenInUrl);
+      
+      // 토큰 저장 후 사용자 정보 즉시 요청
+      fetchUserInfo(tokenInUrl);
+      
+      // URL에서 토큰 제거
       navigate('/preferences', { replace: true });
     }
+  }, [location.search, navigate]);
 
-    // 2. 사용자 정보 가져오기
-    const fetchUserInfo = async () => {
-      try {
-        const response = await api.get('/api/user/me');
-        console.log('User data:', response.data);
-        
-        if (response.data?.nickname) {
-          localStorage.setItem('user_nickname', response.data.nickname);
-          console.log('Nickname saved:', response.data.nickname);
-          setUserInfo(prevState => ({
-            ...prevState,
-            nickname: response.data.nickname
-          }));
-          
-          // 닉네임을 저장한 후 페이지 새로고침
-          window.location.reload();
+  // 사용자 정보 가져오는 함수를 별도로 분리
+  const fetchUserInfo = async (token) => {
+    try {
+      const response = await api.get('/api/user/me', {
+        headers: {
+          'Authorization': `Bearer ${token || localStorage.getItem('access_token')}`
         }
-      } catch (error) {
-        console.error('Error fetching user info:', error);
-      }
-    };
+      });
 
-    // 첫 로드 시에만 실행되도록 플래그 확인
-    const isFirstLoad = sessionStorage.getItem('isFirstLoad') !== 'false';
-    if (isFirstLoad && (tokenInUrl || localStorage.getItem('access_token'))) {
-      sessionStorage.setItem('isFirstLoad', 'false'); // 플래그 업데이트
-      fetchUserInfo();
+      console.log('User info response:', response.data);
+
+      if (response.data) {
+        // 사용자 정보 저장
+        localStorage.setItem('user_nickname', response.data.nickname);
+        
+        // Zustand store 업데이트
+        setUserInfo({
+          nickname: response.data.nickname
+        });
+
+        console.log('Saved user info:', {
+          nickname: response.data.nickname,
+          token: token || localStorage.getItem('access_token')
+        });
+      }
+    } catch (error) {
+      console.error('Error fetching user info:', error);
+      // 에러 발생 시 로컬 스토리지 초기화
+      localStorage.removeItem('access_token');
+      localStorage.removeItem('user_nickname');
     }
-  }, [setUserInfo, navigate, location.search]);
+  };
+
+  // 컴포넌트 마운트 시 토큰이 있으면 사용자 정보 가져오기
+  useEffect(() => {
+    const token = localStorage.getItem('access_token');
+    if (token) {
+      fetchUserInfo(token);
+    }
+  }, []);
 
   const onSavePreferences = async () => {
     try {
