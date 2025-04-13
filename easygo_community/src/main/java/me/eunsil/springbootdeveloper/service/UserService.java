@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import me.eunsil.springbootdeveloper.domain.User;
 import me.eunsil.springbootdeveloper.dto.AddUserRequest;
+import me.eunsil.springbootdeveloper.repository.RefreshTokenRepository;
 import me.eunsil.springbootdeveloper.repository.UserRepository;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -15,6 +16,8 @@ import org.springframework.stereotype.Service;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
+    
 //    private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     public Long save(AddUserRequest dto) {
@@ -46,6 +49,18 @@ public class UserService {
         User updatedUser = user.update(nickname);
         log.info("Updating nickname to: {}", nickname);
         return userRepository.save(updatedUser);
+    }
+
+    public void deleteUser(String email) {
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+
+        // 사용자와 관련된 데이터 삭제'
+        refreshTokenRepository.deleteById(user.getId());
+
+        // 탈퇴 처리
+        user.withdraw();
+        userRepository.save(user);
+        
     }
 }
 

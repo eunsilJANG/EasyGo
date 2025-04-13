@@ -2,12 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from "../../api/axios";
 import './ArticleList.scss';
+import useUserStore from '../../store/userStore';
 
 const Community = () => {
   const [articles, setArticles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
+  const { id } = useUserStore();
 
   const fetchArticles = async () => {
     try {
@@ -46,12 +48,23 @@ const Community = () => {
     return `${year}.${month}.${day}`;
   }
 
+  const handleWriteClick = () => {
+    if (!id) {
+      alert('로그인이 필요한 서비스입니다.');
+      return;
+    }
+    navigate('/community/write');
+  };
+
   const handleArticleClick = async (articleId) => {
+    if (!id) {
+      alert('로그인이 필요한 서비스입니다.');
+      navigate('/login');
+      return;
+    }
+
     try {
-      // 1. 조회수 증가 및 업데이트된 게시글 정보 받기
       const response = await api.post(`/api/articles/${articleId}/view`);
-      
-      // 2. 게시글 목록 업데이트
       setArticles(prevArticles => 
         prevArticles.map(article => 
           article.id === articleId 
@@ -59,12 +72,13 @@ const Community = () => {
             : article
         )
       );
-
-      // 3. 상세 페이지로 이동
       navigate(`/community/articles/${articleId}`);
     } catch (error) {
       console.error('Error:', error);
-      navigate(`/community/articles/${articleId}`);
+      if (error.response && error.response.status === 401) {
+        alert('로그인이 필요한 서비스입니다.');
+        navigate('/login');
+      }
     }
   };
 
@@ -76,7 +90,7 @@ const Community = () => {
       <div className="community-header">
         <div className="header-content">
           <h1>커뮤니티</h1>
-          <button onClick={() => navigate('/community/write')} className="write-button">
+          <button onClick={handleWriteClick} className="write-button">
             글쓰기
           </button>
         </div>

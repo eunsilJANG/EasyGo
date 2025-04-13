@@ -80,10 +80,23 @@ public class WebOAuthSecurityConfig {
                             "/", 
                             "/error", 
                             "/api/user/nickname",
-                            "/uploads/**"  // 업로드된 파일 경로 추가
+                            "/uploads/**",
+                            "/api/user/withdrawal",
+                            "/preferences/**",           // preferences 페이지 접근 허용
+                            "/community",               // community 메인 페이지 접근 허용
+                            "/api/articles",            // 게시글 목록 조회 허용
+                            "/api/articles/search/**"   // 게시글 검색 허용
+                            
                         )
-                    
                         .permitAll()
+                        .requestMatchers(
+                            "/api/articles/*"         // 개별 게시글 조회
+                            "/api/articles/*/comments", // 게시글 댓글
+                            "/api/articles/*/like"      // 게시글 좋아요
+                            "/api/articles/*/edit",     // 수정
+                            "/api/articles/*/delete"    // 삭제
+                        )
+                        .authenticated()                // 인증 필요
                         .anyRequest().authenticated())
                 .oauth2Login(oauth2 -> oauth2
                         .clientRegistrationRepository(clientRegistrationRepository)
@@ -103,8 +116,11 @@ public class WebOAuthSecurityConfig {
                         .successHandler(oAuth2SuccessHandler())
                 )
                 .exceptionHandling(exceptionHandling ->
-                        exceptionHandling.defaultAuthenticationEntryPointFor(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED), new AntPathRequestMatcher("/api/**")))
-                        .build();
+                        exceptionHandling.defaultAuthenticationEntryPointFor(
+                            new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED), 
+                            new AntPathRequestMatcher("/api/**")
+                        ))
+                .build();
     }
 
 

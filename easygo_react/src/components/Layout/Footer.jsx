@@ -8,7 +8,7 @@ const Footer = () => {
 
   const navItems = [
     { path: '/link', icon: HiLink, text: '링크' },
-    { path: '/travel', icon: HiMap, text: '여행' },
+    { path: '/preferences', icon: HiMap, text: '여행' },
     { path: '/mypage', icon: HiUser, text: '마이' },
     { path: '/community', icon: HiChat, text: '커뮤니티' },
   ];

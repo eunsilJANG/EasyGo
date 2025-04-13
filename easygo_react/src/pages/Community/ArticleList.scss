@@ -11,17 +11,19 @@ $border-color: #E2E8F0;
   width: 100%;
   min-height: 100vh;
   background-color: white;
-  padding-top: 140px;
+  padding-top: 56px;
 }
 
 .community-header {
   position: fixed;
-  top: 87px;
+  top: 75px;
   left: 0;
   right: 0;
-  height: 62px;
+  z-index: 900;
   background-color: white;
-  border-bottom: 1px solid #eee;
+  padding: 16px 24px;
+  border-bottom: 1px solid #f0f0f0;
+  margin-top: 0;
 
   .header-content {
     max-width: 800px;
@@ -72,7 +74,7 @@ $border-color: #E2E8F0;
   max-width: 800px;
   margin: 0 auto;
   padding: 0 20px;
-  margin-top: 32px;
+  margin-top: 30px;
 
   .post-item {
     padding: 20px 0;

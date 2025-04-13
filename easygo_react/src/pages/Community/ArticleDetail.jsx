@@ -29,13 +29,19 @@ const ArticleDetail = () => {
         content: response.data.content
       });
       setExistingFiles(response.data.fileUrls || []);
-      setLikecheck(response.data.likecheck);
+      if (id) {
+        setLikecheck(response.data.likecheck);
+      }
       setCommentCount(response.data.commentCount || 0);
       setLoading(false);
     } catch (error) {
       console.error('Error:', error);
-      alert('게시글을 불러오는데 실패했습니다.');
-      navigate('/community');
+      if (error.response && error.response.status === 401) {
+        setLoading(false);
+      } else {
+        alert('게시글을 불러오는데 실패했습니다.');
+        navigate('/community');
+      }
     }
   };
 
@@ -43,7 +49,16 @@ const ArticleDetail = () => {
     fetchData();
   }, [articleId]);
 
+  const checkLogin = () => {
+    if (!id) {
+      alert('로그인이 필요한 서비스입니다.');
+      return false;
+    }
+    return true;
+  };
+
   const handleDelete = async () => {
+    if (!checkLogin()) return;
     if (!window.confirm('정말로 이 게시글을 삭제하시겠습니까?')) return;
     try {
       await api.delete(`/api/articles/${articleId}`);
@@ -80,6 +95,7 @@ const ArticleDetail = () => {
   };
 
   const handleUpdate = async () => {
+    if (!checkLogin()) return;
     try {
       const formData = new FormData();
       
@@ -116,6 +132,7 @@ const ArticleDetail = () => {
   };
 
   const handleLike = async () => {
+    if (!checkLogin()) return;
     try {
       const response = await api.post(`/api/articles/${articleId}/like`);
       console.log('좋아요 응답:', response.data);
@@ -134,6 +151,14 @@ const ArticleDetail = () => {
 
   // isAuthor 체크를 userId로 변경
   const isAuthor = article?.userId === id;  // 백엔드에서 보내는 필드명과 일치시킴
+
+  // 좋아요 버튼 클릭 시 로그인 체크
+  const handleLikeClick = () => {
+    if (!checkLogin()) {
+      return;
+    }
+    handleLike();
+  };
 
   if (loading) return <div className="loading">로딩 중...</div>;
   if (!article) return <div className="error">게시글을 찾을 수 없습니다.</div>;
@@ -272,8 +297,8 @@ const ArticleDetail = () => {
             {/* 좋아요 표시 */}
             {!isEditing && (
               <div 
-                className={`like-display ${likecheck ? 'liked' : ''}`}
-                onClick={handleLike}
+                className={`like-display ${likecheck ? 'liked' : ''} ${!id ? 'disabled' : ''}`}
+                onClick={handleLikeClick}
               >
                 <span className="heart-icon">
                   {likecheck ? '♥' : '♡'}

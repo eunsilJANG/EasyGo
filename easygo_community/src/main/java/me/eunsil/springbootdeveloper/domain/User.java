@@ -7,6 +7,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 
@@ -31,12 +32,18 @@ public class User implements UserDetails {
     @Column(name = "nickname", unique = true)
     private String nickname;
 
+    @Column(name = "is_withdrawn", nullable = false)
+    private boolean isWithdrawn = false;
+
+    @Column(name = "withdrawn_at")
+    private LocalDateTime withdrawnAt;
+
     @Builder
     public User(String email, String password, String nickname, String auth){
         this.email = email;
         this.password = password;
         this.nickname = nickname;
-
+        this.isWithdrawn = false;
     }
 
     public User update(String nickname) {
@@ -89,7 +96,13 @@ public class User implements UserDetails {
     //계정 사용 가능 여부 반환
     @Override
     public boolean isEnabled() {
-        //  계정이 사용 가능한지 확인하는 로직
-        return true;
+        return !isWithdrawn;
+    }
+
+    public void withdraw() {
+        this.isWithdrawn = true;
+        this.withdrawnAt = LocalDateTime.now();
+        this.nickname = "탈퇴한 회원";
+        this.password = null;
     }
 }

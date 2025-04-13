@@ -41,6 +41,7 @@ public class UserApiController {
     private final AuthenticationManager authenticationManager;
     private final RefreshTokenRepository refreshTokenRepository;
 
+
     public static final String REFRESH_TOKEN_COOKIE_NAME = "refresh_token";
     public static final Duration REFRESH_TOKEN_DURATION = Duration.ofDays(14);
     public static final Duration ACCESS_TOKEN_DURATION = Duration.ofDays(1);
@@ -65,6 +66,31 @@ public class UserApiController {
         return ResponseEntity.ok()
                 .body(user);
     }
+
+    @DeleteMapping("/user/withdrawal")
+    public ResponseEntity<?> withdrawUser(Authentication authentication, HttpServletRequest request, HttpServletResponse response) {
+        try{
+            String email = authentication.getName();
+            log.info("Withdrawal request received for email: {}", email);
+
+            // 사용자 삭제제
+            User user = userService.findByEmail(email);
+            userService.deleteUser(email);
+
+            // 쿠키 삭제
+            CookieUtil.deleteCookie(request, response, REFRESH_TOKEN_COOKIE_NAME);
+
+            // 로그아웃 처리
+            SecurityContextLogoutHandler logoutHandler = new SecurityContextLogoutHandler();
+            logoutHandler.logout(request, response, authentication);
+
+            return ResponseEntity.ok(Map.of("message", "회원탈퇴가 완료되었습니다."));
+        } catch (Exception e) {
+            log.error("Withdrawal failed: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("회원탈퇴 처리 중 오류가 발생했습니다.");
+        }
+            // 응답 메시지 반환
+        }
 
     @PostMapping("/signup")
     public ResponseEntity<Map<String, String>> signup(@RequestBody AddUserRequest newuser) {

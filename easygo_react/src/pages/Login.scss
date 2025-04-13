@@ -170,6 +170,12 @@ $border-color: #E2E8F0;
 }
 
 .login-box {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  margin-top: 20px;
+
   button {
     width: 100%;
     padding: 12px;
@@ -292,4 +298,92 @@ h2 {
 
 .login-button:hover {
   opacity: 0.8;
+}
+
+.guest-login-button {
+  width: 100%;
+  padding: 12px;
+  margin-top: 12px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  background-color: #f8f9fa;
+  color: #666;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    background-color: #e9ecef;
+    color: #333;
+  }
+  
+  &:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+  }
+}
+
+.welcome-text {
+  text-align: center;
+  margin-bottom: 40px;
+  
+  h2 {
+    font-size: 24px;
+    font-weight: 600;
+    color: $text-primary;
+    margin-bottom: 8px;
+  }
+  
+  p {
+    font-size: 15px;
+    color: $text-secondary;
+  }
+}
+
+.logo {
+  .logo-text-easy {
+    font-size: 32px;
+    font-weight: 700;
+    color: $primary-color;
+    letter-spacing: -0.5px;
+  }
+  
+  .logo-text-go {
+    font-size: 32px;
+    font-weight: 700;
+    color: $secondary-color;
+    letter-spacing: -0.5px;
+    margin-left: 4px;
+  }
+  
+  .logo-icon {
+    font-size: 24px;
+    margin-left: 8px;
+    transform: rotate(-45deg);
+    display: inline-block;
+  }
+}
+
+.guest-login-button {
+  .guest-icon {
+    margin-right: 8px;
+    font-size: 18px;
+  }
+}
+
+.footer-text {
+  text-align: center;
+  margin-top: 32px;
+  font-size: 13px;
+  color: $text-secondary;
+  
+  a {
+    color: $primary-color;
+    text-decoration: none;
+    font-weight: 500;
+    
+    &:hover {
+      text-decoration: underline;
+    }
+  }
 }

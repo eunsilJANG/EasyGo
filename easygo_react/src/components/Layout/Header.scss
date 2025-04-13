@@ -12,13 +12,15 @@ $text-secondary: #636E72;
   top: 0;
   left: 0;
   right: 0;
-  z-index: 9999;
+  z-index: 1000;
   background-color: white;
+  padding: 12px 24px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1.2rem 2rem;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  border-bottom: 1px solid #f0f0f0;
+  height: 73px;
+  box-sizing: border-box;
 
   &__left {
     .header__logo {
@@ -82,61 +84,158 @@ $text-secondary: #636E72;
       }
     }
 
+    .menu-container {
+      position: relative;
+      margin-left: 16px;
+    }
+
     .menu-button {
       background: none;
       border: none;
       cursor: pointer;
-      padding: 0.8rem;
-      border-radius: 50%;
-      transition: all 0.3s ease;
-
-      &:hover {
-        background-color: $background-color;
-
-        .menu-icon,
-        .menu-icon::before,
-        .menu-icon::after {
-          background-color: $primary-color;
+      padding: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      
+      &.active {
+        .menu-icon {
+          background: transparent;
+          
+          &:before {
+            transform: rotate(45deg);
+            top: 0;
+          }
+          
+          &:after {
+            transform: rotate(-45deg);
+            bottom: 0;
+          }
         }
       }
+    }
 
-      .menu-icon {
-        display: block;
-        width: 24px;
+    .menu-icon {
+      display: block;
+      width: 20px;
+      height: 2px;
+      background: #333;
+      position: relative;
+      transition: all 0.3s ease;
+      
+      &:before,
+      &:after {
+        content: '';
+        position: absolute;
+        left: 0;
+        width: 20px;
         height: 2px;
-        background-color: $text-primary;
-        position: relative;
+        background: #333;
         transition: all 0.3s ease;
+      }
+      
+      &:before {
+        top: -6px;
+      }
+      
+      &:after {
+        bottom: -6px;
+      }
+    }
 
-        &::before,
-        &::after {
-          content: '';
-          position: absolute;
-          width: 24px;
-          height: 2px;
-          background-color: $text-primary;
-          left: 0;
-          transition: all 0.3s ease;
-        }
+    .dropdown-menu {
+      position: absolute;
+      top: calc(100% + 8px);
+      right: 0;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      padding: 8px 0;
+      min-width: 120px;
+      z-index: 1000;
+      
+      &:before {
+        content: '';
+        position: absolute;
+        top: -4px;
+        right: 12px;
+        width: 8px;
+        height: 8px;
+        background: white;
+        transform: rotate(45deg);
+        box-shadow: -2px -2px 5px rgba(0, 0, 0, 0.05);
+      }
+    }
 
-        &::before {
-          top: -6px;
+    .dropdown-item {
+      display: block;
+      width: 100%;
+      padding: 8px 16px;
+      border: none;
+      background: none;
+      text-align: left;
+      color: #333;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-decoration: none;
+      
+      &:hover {
+        background-color: rgba(78, 205, 196, 0.1);
+        color: $secondary-color;
+      }
+      
+      &.withdrawal {
+        color: #ff6b6b;
+        border-top: 1px solid #eee;
+        margin-top: 4px;
+        padding-top: 12px;
+        
+        &:hover {
+          background-color: rgba(255, 107, 107, 0.1);
+          color: #ff6b6b;
         }
+      }
+    }
 
-        &::after {
-          bottom: -6px;
-        }
+    .login-button {
+      display: flex;
+      align-items: center;
+      padding: 8px 20px;
+      background-color: rgba($primary-color, 0.9);
+      color: white;
+      border-radius: 50px;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 500;
+      margin-top: 8px;
+      transition: all 0.2s ease;
+      
+      &:hover {
+        background-color: rgba($primary-color, 1);
+        transform: translateY(-1px);
+      }
+      
+      &:active {
+        transform: translateY(1px);
+      }
+      
+      &::before {
+        margin-right: 6px;
+        font-size: 18px;
       }
     }
   }
 }
 
 body {
-  padding-top: 60px;
+  padding-top: 56px;
 }
 
 .community-page, .article-detail-page {
   position: relative;
   z-index: auto;
-  padding-top: 60px;
+  padding-top: 0;
 } 
