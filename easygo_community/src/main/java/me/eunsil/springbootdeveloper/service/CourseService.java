@@ -36,4 +36,27 @@ public class CourseService {
 
         courseRepository.delete(course);
      }
+
+     public Course getCourseById(String id) {
+        return courseRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("코스를 찾을 수 없습니다: " + id));
+     }
+
+     public Course updateCourse(String courseId, Course course, String userId) {
+        Course existingCourse = courseRepository.findById(courseId)
+            .orElseThrow(() -> new ResourceNotFoundException("Course not found"));
+        
+        // 권한 체크
+        if (!existingCourse.getUserId().equals(userId)) {
+            throw new UnauthorizedException("Not authorized to update this course");
+        }
+
+        // 기존 코스 정보 업데이트
+        existingCourse.setName(course.getName());
+        existingCourse.setDays(course.getDays());
+        existingCourse.setTags(course.getTags());
+        existingCourse.setUpdatedAt(LocalDateTime.now());
+
+        return courseRepository.save(existingCourse);
+     }
 }

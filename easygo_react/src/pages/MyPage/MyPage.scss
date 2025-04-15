@@ -1,14 +1,21 @@
 .mypage {
+  height: calc(100vh - 60px);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 20px 16px 80px;
   max-width: 1200px;
   margin: 0 auto;
-  padding: 2rem;
 
   .mypage-header {
+    position: sticky;
+    top: 0;
+    background: white;
+    z-index: 10;
+    padding: 16px 0;
+    margin-bottom: 24px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 3rem;
-    padding: 0 1rem;
 
     h1 {
       font-size: 2.5rem;
@@ -45,7 +52,8 @@
   .courses-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 2rem;
+    gap: 20px;
+    padding-bottom: 60px;
 
     .course-card {
       background: white;
@@ -134,5 +142,22 @@
     padding: 4rem;
     color: #666;
     font-size: 1.2rem;
+  }
+
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: #f1f1f1;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 3px;
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background: #555;
   }
 } 

@@ -1,69 +1,98 @@
 .travel-course {
+  display: flex;
+  flex-direction: column;
+  height: 100vh; // 전체 높이 사용
   padding: 20px;
   background-color: #fff;
   min-height: 100vh;
   max-width: 800px;
   margin: 0 auto;
 
-  .course-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 2rem;
-    
-    .title {
-      font-size: 2rem;
-      color: #333;
-    }
+  .fixed-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background: white;
+    z-index: 1000;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 
-    .save-course-button {
+    .course-header {
       display: flex;
+      justify-content: space-between;
       align-items: center;
-      gap: 8px;
-      padding: 1rem 2rem;
-      font-size: 1.2rem;
-      font-weight: 600;
-      color: white;
-      background-color: #FF6B6B;
-      border: none;
-      border-radius: 50px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      box-shadow: 0 4px 12px rgba(255, 107, 107, 0.2);
+      margin-bottom: 24px;
       
-      .save-icon {
-        font-size: 1.4rem;
+      .title {
+        font-size: 2rem;
+        color: #333;
       }
-      
-      &:hover {
-        background-color: darken(#FF6B6B, 5%);
-        transform: translateY(-2px);
-        box-shadow: 0 6px 16px rgba(255, 107, 107, 0.3);
+
+      .save-course-button {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 1rem 2rem;
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: white;
+        background-color: #FF6B6B;
+        border: none;
+        border-radius: 50px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(255, 107, 107, 0.2);
+        
+        .save-icon {
+          font-size: 1.4rem;
+        }
+        
+        &:hover {
+          background-color: darken(#FF6B6B, 5%);
+          transform: translateY(-2px);
+          box-shadow: 0 6px 16px rgba(255, 107, 107, 0.3);
+        }
+        
+        &:active {
+          transform: translateY(0);
+          box-shadow: 0 2px 8px rgba(255, 107, 107, 0.2);
+        }
       }
-      
-      &:active {
-        transform: translateY(0);
-        box-shadow: 0 2px 8px rgba(255, 107, 107, 0.2);
+
+      .course-info {
+        margin-bottom: 24px;
+
+        .location {
+          font-size: 16px;
+          color: #666;
+          margin-bottom: 12px;
+        }
+
+        .edit-description {
+          font-size: 14px;
+          color: #666;
+          background-color: #f8f9fa;
+          padding: 8px 12px;
+          border-radius: 6px;
+          margin-top: 8px;
+        }
+      }
+
+      .tags-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
       }
     }
 
     .course-info {
-      margin-bottom: 16px;
+      margin-bottom: 24px;
 
       .location {
         font-size: 16px;
         color: #666;
-        margin: 20px 0;
-        padding: 12px 0;
-        
-        span {
-          margin-right: 8px;
-          
-          &:not(:last-child)::after {
-            content: ',';
-            margin-left: 2px;
-          }
-        }
+        margin-bottom: 12px;
       }
 
       .edit-description {
@@ -76,253 +105,267 @@
       }
     }
 
-    .tags-container {
+    .tabs {
       display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-top: 16px;
+      gap: 12px;
+      margin-bottom: 0; // 하단 마진 제거
+      border-bottom: 1px solid #eee;
+      padding-bottom: 12px;
 
-      .tag {
-        background-color: rgba(255, 107, 107, 0.1);
-        color: #FF6B6B;
-        padding: 6px 16px;
+      .tab {
+        padding: 8px 20px;
         border-radius: 20px;
-        font-size: 14px;
-        margin-right: 8px;
-        margin-bottom: 8px;
-        
-        &:hover {
-          background-color: rgba(255, 107, 107, 0.2);
-        }
-      }
-    }
-  }
-
-  .course-title {
-    padding: 20px 0;
-    
-    h2 {
-      margin: 0 0 10px 0;
-      font-size: 24px;
-    }
-
-    .location {
-      color: #666;
-      margin-bottom: 10px;
-    }
-
-    .tags {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      margin-top: 10px;
-
-      .tag {
-        padding: 4px 12px;
-        border-radius: 16px;
-        font-size: 13px;
-        background-color: #f0f0f0;
+        border: none;
+        background-color: #f8f9fa;
         color: #666;
+        font-size: 14px;
+        cursor: pointer;
+        transition: all 0.2s ease;
 
-        &.edit-hint {
-          background-color: #4A90E2;
+        &:hover {
+          background-color: #e9ecef;
+        }
+
+        &.active {
+          background-color: #4ECDC4;
           color: white;
         }
       }
     }
   }
 
-  .course-days {
-    .day-container {
-      margin-bottom: 30px;
+  .scrollable-content {
+    margin-top: 200px; // fixed-header의 높이만큼 여백 추가 (실제 헤더 높이에 맞게 조정 필요)
+    padding: 20px;
+    overflow-y: auto;
+    flex: 1;
 
-      .day-header {
-        padding: 15px 20px;
-        background: rgba(255, 107, 107, 0.05);
-        border-radius: 8px;
-        margin-bottom: 20px;
-        border-left: 4px solid #FF6B6B;
-
-        .day-number {
-          font-weight: 600;
-          color: #FF6B6B;
-          margin-right: 10px;
-          font-size: 16px;
-        }
-
-        .day-date {
-          color: #FF8787;
-        }
+    .course-title {
+      padding: 20px 0;
+      
+      h2 {
+        margin: 0 0 10px 0;
+        font-size: 24px;
       }
 
-      .timeline {
-        position: relative;
-        padding: 20px 0;
+      .location {
+        color: #666;
+        margin-bottom: 10px;
+      }
 
-        &::before {
-          content: '';
-          position: absolute;
-          left: 60px;
-          top: 0;
-          bottom: 0;
-          width: 2px;
-          background-color: rgba(78, 205, 196, 0.3);
+      .tags {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin-top: 10px;
+
+        .tag {
+          padding: 4px 12px;
+          border-radius: 16px;
+          font-size: 13px;
+          background-color: #f0f0f0;
+          color: #666;
+
+          &.edit-hint {
+            background-color: #4A90E2;
+            color: white;
+          }
+        }
+      }
+    }
+
+    .course-days {
+      .day-container {
+        margin-bottom: 30px;
+
+        .day-header {
+          padding: 15px 20px;
+          background: rgba(255, 107, 107, 0.05);
+          border-radius: 8px;
+          margin-bottom: 20px;
+          border-left: 4px solid #FF6B6B;
+
+          .day-number {
+            font-weight: 600;
+            color: #FF6B6B;
+            margin-right: 10px;
+            font-size: 16px;
+          }
+
+          .day-date {
+            color: #FF8787;
+          }
         }
 
-        .timeline-item {
-          display: flex;
-          margin: 20px 0;
+        .timeline {
           position: relative;
-          user-select: none;
+          padding: 20px 0;
 
-          &.draggable {
-            cursor: grab;
-            
-            .content-column {
-              border: 1px dashed rgba(255, 107, 107, 0.3);
+          &::before {
+            content: '';
+            position: absolute;
+            left: 60px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background-color: rgba(78, 205, 196, 0.3);
+          }
+
+          .timeline-item {
+            display: flex;
+            margin: 20px 0;
+            position: relative;
+            user-select: none;
+
+            &.draggable {
+              cursor: grab;
               
+              .content-column {
+                border: 1px dashed rgba(255, 107, 107, 0.3);
+                
+                &:hover {
+                  border-color: #FF6B6B;
+                  background-color: rgba(255, 107, 107, 0.05);
+                }
+              }
+              
+              &:active {
+                cursor: grabbing;
+              }
+            }
+
+            &.dragging {
+              opacity: 0.7;
+              background: white;
+              box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            }
+
+            .time-column {
+              width: 60px;
+              flex-shrink: 0;
+              text-align: right;
+              padding-right: 20px;
+              font-size: 14px;
+              color: #666;
+              position: relative;
+
+              &::after {
+                content: '';
+                position: absolute;
+                right: -5px;
+                top: 50%;
+                transform: translateY(-50%);
+                width: 10px;
+                height: 10px;
+                border-radius: 50%;
+                background-color: #3DB5AE;
+                border: 2px solid #4ECDC4;
+              }
+            }
+
+            .content-column {
+              flex: 1;
+              margin-left: 30px;
+              background: white;
+              border-radius: 8px;
+              box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+              overflow: visible;
+              display: flex;
+              position: relative;
+              pointer-events: auto;
+
+              .spot-info {
+                pointer-events: none;
+                padding: 15px;
+                
+                h3 {
+                  color: #FF6B6B;
+                  font-size: 16px;
+                  font-weight: 600;
+                  margin-bottom: 8px;
+                }
+
+                .address {
+                  color: #666;
+                  font-size: 14px;
+                  margin-bottom: 4px;
+                }
+
+                .description {
+                  color: #333;
+                  font-size: 14px;
+                  line-height: 1.5;
+                }
+
+                .recommendation {
+                  color: #444;
+                  font-size: 14px;
+                  margin-top: 8px;
+                }
+              }
+
               &:hover {
                 border-color: #FF6B6B;
-                background-color: rgba(255, 107, 107, 0.05);
+                background-color: rgba(255, 107, 107, 0.02);
+                .description {
+                  color: #3DB5AE;
+                }
               }
-            }
-            
-            &:active {
-              cursor: grabbing;
-            }
-          }
 
-          &.dragging {
-            opacity: 0.7;
-            background: white;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-          }
-
-          .time-column {
-            width: 60px;
-            flex-shrink: 0;
-            text-align: right;
-            padding-right: 20px;
-            font-size: 14px;
-            color: #666;
-            position: relative;
-
-            &::after {
-              content: '';
-              position: absolute;
-              right: -5px;
-              top: 50%;
-              transform: translateY(-50%);
-              width: 10px;
-              height: 10px;
-              border-radius: 50%;
-              background-color: #3DB5AE;
-              border: 2px solid #4ECDC4;
-            }
-          }
-
-          .content-column {
-            flex: 1;
-            margin-left: 30px;
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            overflow: visible;
-            display: flex;
-            position: relative;
-            pointer-events: auto;
-
-            .spot-info {
-              pointer-events: none;
-              padding: 15px;
-              
-              h3 {
+              .delete-spot-button {
+                width: 28px;
+                height: 28px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border-radius: 50%;
+                border: none;
+                background-color: rgba(255, 107, 107, 0.1);
                 color: #FF6B6B;
-                font-size: 16px;
+                font-size: 20px;
                 font-weight: 600;
-                margin-bottom: 8px;
-              }
+                line-height: 0;
+                cursor: pointer;
+                transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+                position: absolute;
+                top: 50%;
+                right: -14px;
+                transform: translateY(-50%);
+                z-index: 100;
+                box-shadow: 0 2px 6px rgba(255, 107, 107, 0.1);
+                opacity: 0.9;
 
-              .address {
-                color: #666;
-                font-size: 14px;
-                margin-bottom: 4px;
-              }
+                &:hover {
+                  background-color: #FF6B6B;
+                  color: white;
+                  opacity: 1;
+                  transform: translateY(-50%) scale(1.05);
+                  box-shadow: 0 3px 8px rgba(255, 107, 107, 0.2);
+                }
 
-              .description {
-                color: #333;
-                font-size: 14px;
-                line-height: 1.5;
-              }
-
-              .recommendation {
-                color: #444;
-                font-size: 14px;
-                margin-top: 8px;
-              }
-            }
-
-            &:hover {
-              border-color: #FF6B6B;
-              background-color: rgba(255, 107, 107, 0.02);
-              .description {
-                color: #3DB5AE;
+                &:active {
+                  transform: translateY(-50%) scale(0.95);
+                }
               }
             }
 
-            .delete-spot-button {
-              width: 28px;
-              height: 28px;
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              border-radius: 50%;
-              border: none;
-              background-color: rgba(255, 107, 107, 0.1);
-              color: #FF6B6B;
-              font-size: 20px;
-              font-weight: 600;
-              line-height: 0;
-              cursor: pointer;
-              transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-              position: absolute;
-              top: 50%;
-              right: -14px;
-              transform: translateY(-50%);
-              z-index: 100;
-              box-shadow: 0 2px 6px rgba(255, 107, 107, 0.1);
-              opacity: 0.9;
-
-              &:hover {
-                background-color: #FF6B6B;
-                color: white;
-                opacity: 1;
-                transform: translateY(-50%) scale(1.05);
-                box-shadow: 0 3px 8px rgba(255, 107, 107, 0.2);
-              }
-
-              &:active {
-                transform: translateY(-50%) scale(0.95);
-              }
+            &.dragging .delete-button-wrapper {
+              display: none;
             }
-          }
-
-          &.dragging .delete-button-wrapper {
-            display: none;
           }
         }
-      }
 
-      &.drag-over {
-        position: relative;
-        
-        &::before {
-          content: '';
-          position: absolute;
-          inset: 0;
-          border: 2px dashed #FF6B6B;
-          border-radius: 8px;
-          pointer-events: none;
+        &.drag-over {
+          position: relative;
+          
+          &::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border: 2px dashed #FF6B6B;
+            border-radius: 8px;
+            pointer-events: none;
+          }
         }
       }
     }
@@ -380,6 +423,19 @@
         }
       }
     }
+
+    .tabs {
+      gap: 8px;
+      
+      .tab {
+        padding: 6px 16px;
+        font-size: 13px;
+      }
+    }
+
+    .map-container {
+      height: 400px;
+    }
   }
 }
 
@@ -416,34 +472,6 @@
   color: #666;
   margin-bottom: 8px;
   opacity: 0.7;
-}
-
-.tabs {
-  display: flex;
-  gap: 12px;
-  padding: 16px 0;
-  border-bottom: 1px solid #eee;
-  margin-bottom: 20px;
-
-  .tab {
-    padding: 8px 20px;
-    border-radius: 20px;
-    border: none;
-    background-color: rgba(78, 205, 196, 0.1);  // #4ECDC4의 연한 버전
-    color: #4ECDC4;  // 민트색으로 변경
-    font-size: 14px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-
-    &:hover {
-      background-color: rgba(78, 205, 196, 0.2);  // hover 시 약간 더 진한 배경
-    }
-
-    &.active {
-      background-color: #4ECDC4;  // 활성 탭 배경색 변경
-      color: white;
-    }
-  }
 }
 
 .edit-description {
@@ -625,3 +653,74 @@
     }
   }
 } 
+
+.tab-content {
+  position: relative;
+  
+  .map-container {
+    width: 100%;
+    height: 600px;
+    border: 1px solid #dee2e6;
+    border-radius: 12px;
+    overflow: hidden;
+    background-color: #f8f9fa;
+  }
+}
+
+.daily-maps {
+  .day-map-container {
+    margin-bottom: 40px;
+    
+    .day-header {
+      margin-bottom: 15px;
+      font-size: 1.2em;
+      font-weight: bold;
+      
+      .day-number {
+        margin-right: 10px;
+        color: #333;
+      }
+      
+      .day-date {
+        color: #666;
+      }
+    }
+    
+    .spots-summary {
+      margin-top: 15px;
+      padding: 15px;
+      background: #f8f9fa;
+      border-radius: 8px;
+      
+      .spot-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 8px;
+        
+        .spot-number {
+          width: 24px;
+          height: 24px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background: #45B7D1;
+          color: white;
+          border-radius: 50%;
+          margin-right: 10px;
+          font-size: 0.9em;
+        }
+        
+        .spot-time {
+          width: 60px;
+          color: #666;
+          margin-right: 15px;
+        }
+        
+        .spot-name {
+          flex: 1;
+          color: #333;
+        }
+      }
+    }
+  }
+}

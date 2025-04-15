@@ -90,9 +90,9 @@ public class WebOAuthSecurityConfig {
                         )
                         .permitAll()
                         .requestMatchers(
-                            "/api/articles/*"         // 개별 게시글 조회
+                            "/api/articles/*",         // 개별 게시글 조회
                             "/api/articles/*/comments", // 게시글 댓글
-                            "/api/articles/*/like"      // 게시글 좋아요
+                            "/api/articles/*/like",      // 게시글 좋아요
                             "/api/articles/*/edit",     // 수정
                             "/api/articles/*/delete"    // 삭제
                         )

@@ -20,14 +20,15 @@ public class Course {
     @Id
     private String id;
 
-
     @org.springframework.data.mongodb.core.index.Indexed
     private String userId;
     private String name;
+    private String location;
     private List<Day> days;
     private List<String> tags;
     @CreatedDate
     private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 
     @Data
     @NoArgsConstructor
@@ -42,7 +43,7 @@ public class Course {
         private String name;
         private String time;
         private String address;
-        private Coordinates Coordinates;
+        private Coordinates coordinates;
         private String description;
         private String category;
     }
@@ -50,8 +51,12 @@ public class Course {
     @Data
     @NoArgsConstructor
     public static class Coordinates {
-        private String lat;
-        private String lng;
-    
+        private double lat;
+        private double lng;
+        
+        public Coordinates(double lat, double lng) {
+            this.lat = lat;
+            this.lng = lng;
+        }
     }
 }

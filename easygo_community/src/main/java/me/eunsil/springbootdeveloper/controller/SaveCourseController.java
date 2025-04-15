@@ -41,5 +41,15 @@ public class SaveCourseController {
         courseService.deleteCourse(courseId, userDetails.getUsername());
         return ResponseEntity.noContent().build();
     }
+
+    @PutMapping("/{courseId}")
+    public ResponseEntity<Course> updateCourse(
+        @PathVariable("courseId") String courseId,
+        @RequestBody Course course,
+        @AuthenticationPrincipal UserDetails userDetails
+    ) {
+        Course updatedCourse = courseService.updateCourse(courseId, course, userDetails.getUsername());
+        return ResponseEntity.ok(updatedCourse);
+    }
 }
 

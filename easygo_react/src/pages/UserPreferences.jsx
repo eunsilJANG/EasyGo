@@ -17,13 +17,7 @@ const UserPreferences = () => {
   const [startDate, setStartDate] = useState(today);
   const [endDate, setEndDate] = useState(tomorrow);
   const [selectedAges, setSelectedAges] = useState([]);
-  const [travelers, setTravelers] = useState({
-    성인: 0,
-    청소년: 0,
-    어린이: 0,
-    영유아: 0,
-    반려견: 0
-  });
+  const [budget, setBudget] = useState(null);
   const [selectedAreas, setSelectedAreas] = useState([]);
   const setUserInfo = useUserStore((state) => state.setUserInfo);
 
@@ -89,13 +83,6 @@ const UserPreferences = () => {
       ]
     }
   ];
-
-  const handleTravelerChange = (type, operation) => {
-    setTravelers(prev => ({
-      ...prev,
-      [type]: operation === 'add' ? prev[type] + 1 : Math.max(0, prev[type] - 1)
-    }));
-  };
 
   const handleDateChange = (dates) => {
     const [start, end] = dates;
@@ -186,13 +173,7 @@ const UserPreferences = () => {
             startDate: formatDate(startDate),
             endDate: formatDate(endDate),
             ageGroups: selectedAges,
-            travelers: {
-                adult: travelers['성인'],
-                teen: travelers['청소년'],
-                child: travelers['어린이'],
-                infant: travelers['영유아'],
-                pet: travelers['반려견']
-            }
+            budget: budget || '중'
         };
 
         console.log("Sending preferences:", preferences);
@@ -326,33 +307,22 @@ const UserPreferences = () => {
             ))}
           </div>
           {selectedAges.length === 0 && (
-            <p className="age-warning">하나 이상의 연령대를 선택해주세요.</p>
+            <p className="selection-guide">하나 이상의 연령대를 선택해주세요.</p>
           )}
         </section>
 
-        {/* 인원 설정 섹션 */}
-        <section className="travelers-section">
-          <h3>일행</h3>
-          <div className="travelers-list">
-            {Object.entries(travelers).map(([type, count]) => (
-              <div key={type} className="traveler-item">
-                <span className="traveler-type">{type}</span>
-                <div className="traveler-controls">
-                  <button 
-                    className="control-button"
-                    onClick={() => handleTravelerChange(type, 'subtract')}
-                  >
-                    -
-                  </button>
-                  <span className="traveler-count">{count}명</span>
-                  <button 
-                    className="control-button"
-                    onClick={() => handleTravelerChange(type, 'add')}
-                  >
-                    +
-                  </button>
-                </div>
-              </div>
+        {/* 예산 설정 섹션 */}
+        <section className="budget-section">
+          <h3>예산 (선택사항)</h3>
+          <div className="budget-list">
+            {['상', '중상', '중', '중하', '하'].map((level) => (
+              <button
+                key={level}
+                className={`budget-button ${budget === level ? 'active' : ''}`}
+                onClick={() => setBudget(budget === level ? null : level)}
+              >
+                {level}
+              </button>
             ))}
           </div>
         </section>

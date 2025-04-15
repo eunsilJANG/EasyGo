@@ -34,7 +34,8 @@ const MyPage = () => {
     navigate('/travel-course', { 
       state: { 
         course: course,
-        fromMyPage: true  // 마이페이지에서 왔다는 표시
+        courseId: course.id,  // 기존 일정의 ID 전달
+        fromMyPage: true
       } 
     });
   };

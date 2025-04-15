@@ -321,4 +321,47 @@
       }
     }
   }
+}
+
+.budget-section {
+  margin: 20px 0;
+  padding: 20px;
+
+  .budget-list {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 15px;
+  }
+
+  .budget-button {
+    min-width: 60px;
+    padding: 12px 20px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    background: white;
+    cursor: pointer;
+    font-size: 0.9rem;
+    color: #333;
+    transition: all 0.2s ease;
+
+    &:hover {
+      border-color: #FF6B6B;
+      background-color: #fff;
+    }
+
+    &.active {
+      background-color: white;
+      color: #FF6B6B;
+      border-color: #FF6B6B;
+      font-weight: 500;
+    }
+  }
+}
+
+.selection-guide {
+  margin-top: 8px;
+  font-size: 0.8rem;
+  color: #999;
+  text-align: center;
 } 
