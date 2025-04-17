@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { aiApi, api } from '../api/axios';
+import { aiApi, api } from '../../api/axios';
 import './ContentInput.scss';
 
 const ContentInput = () => {
@@ -144,41 +144,58 @@ const ContentInput = () => {
   return (
     <div className="content-input-container">
       <div className="content-header">
-        <h2>여행 콘텐츠 분석</h2>
-        <p>여행 콘텐츠 링크를 입력하시면<br />AI가 자동으로 여행 코스를 만들어드립니다</p>
+        <h2>EASY <span className="highlight">GO</span></h2>
+        <p className="subtitle">여행 콘텐츠 분석</p>
+        <p className="description">
+          여행 콘텐츠 링크를 입력하시면<br />
+          AI가 자동으로 여행 코스를 만들어드립니다
+        </p>
       </div>
 
       <div className="input-section">
         <div className="platform-icons">
-          <div 
-            className="platform"
-            onClick={() => window.open('https://www.youtube.com', '_blank')}
-            style={{ cursor: 'pointer' }}
-          >
-            <div className="icon youtube">▶</div>
+          <div className="platform">
+            <div className="icon youtube">
+              <svg 
+                viewBox="0 0 24 24" 
+                width="24" 
+                height="24" 
+                className="youtube-play-icon"
+              >
+                <path 
+                  fill="#FFFFFF" 
+                  d="M8 5v14l11-7z"
+                />
+              </svg>
+            </div>
             <span>YouTube</span>
-            <small className="url-example">
-              <strong>지원 url</strong>
-              <br/>
-              유튜브 영상
-            </small>
+            <div className="url-example">
+              <span className="label">지원 URL</span>
+              <span className="text">유튜브 영상</span>
+            </div>
           </div>
-          <div 
-            className="platform"
-            onClick={() => window.open('https://blog.naver.com', '_blank')}
-            style={{ cursor: 'pointer' }}
-          >
-            <div className="icon naver">N</div>
+
+          <div className="platform">
+            <div className="icon naver">
+              <svg 
+                viewBox="0 0 24 24" 
+                width="24" 
+                height="24" 
+                className="naver-icon"
+              >
+                <path 
+                  fill="#FFFFFF" 
+                  d="M16.273 12.845L7.376 0H0v24h7.726V11.155L16.624 24H24V0h-7.727z"
+                />
+              </svg>
+            </div>
             <span>네이버</span>
-            <small className="url-example">
-              <strong>지원 url</strong>
-              <br/>
-              네이버 블로그
-              <br/>
-              네이버 인플루언서
-              <br/>
-              네이버 TV
-            </small>
+            <div className="url-example">
+              <span className="label">지원 URL</span>
+              <span className="text">네이버 블로그</span>
+              <span className="text">네이버 인플루언서</span>
+              <span className="text">네이버 TV</span>
+            </div>
           </div>
         </div>
 
@@ -205,12 +222,24 @@ const ContentInput = () => {
       {!schedule && (
         <div className="info-box">
           <h3>✨ 이런 콘텐츠를 분석할 수 있어요</h3>
-          <ul>
-            <li>여행 브이로그</li>
-            <li>여행 후기 블로그</li>
-            <li>여행 코스 추천 글/영상</li>
-            <li>관광지 리뷰</li>
-          </ul>
+          <div className="info-items">
+            <div className="info-item">
+              <span className="icon">📹</span>
+              <span className="text">여행 브이로그</span>
+            </div>
+            <div className="info-item">
+              <span className="icon">📝</span>
+              <span className="text">여행 후기 블로그</span>
+            </div>
+            <div className="info-item">
+              <span className="icon">🗺️</span>
+              <span className="text">여행 코스 추천</span>
+            </div>
+            <div className="info-item">
+              <span className="icon">⭐</span>
+              <span className="text">관광지 리뷰</span>
+            </div>
+          </div>
         </div>
       )}
 

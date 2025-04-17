@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
-import { api } from '../api/axios';
-import useUserStore from '../store/userStore';
+import { api } from '../../api/axios';
+import useUserStore from '../../store/userStore';
 import './SetNickname.scss';
 
 const SetNickname = () => {

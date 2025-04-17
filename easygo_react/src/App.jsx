@@ -4,11 +4,11 @@ import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-route
 import Header from './components/Layout/Header';
 import Footer from './components/Layout/Footer';
 import Login from './pages/Login/Login';
-import ContentInput from './pages/ContentInput';
-import UserPreferences from './pages/UserPreferences';
-import SignUp from './pages/SignUp';
+import ContentInput from './pages/ContentLink/ContentInput';
+import UserPreferences from './pages/TravelCourse/UserPreferences';
+import SignUp from './pages/Login/SignUp';
 import Community from './pages/Community/ArticleList';
-import SetNickname from './pages/SetNickname';
+import SetNickname from './pages/MyPage/SetNickname';
 import WriteArticle from './pages/Community/WriteArticle';
 import ArticleDetail from './pages/Community/ArticleDetail';
 import TravelCourse from './pages/TravelCourse/TravelCourse';
@@ -39,7 +39,6 @@ const AppLayout = () => {
         <Route path="/link" element={<div>Link Page</div>} />
         <Route path="/travel" element={<div>Travel Page</div>} />
         <Route path="/mypage" element={<MyPage />} />
-        <Route path="/wish" element={<div>Wish Page</div>} />
         <Route path="/travel-course" element={<TravelCourse />} />
       </Routes>
       {!hideHeaderFooter && <Footer />}

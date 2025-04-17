@@ -49,6 +49,11 @@ const MyPage = () => {
     fetchSavedCourses();
   }, []);
 
+  // 페이지 진입 시 스크롤 최상단으로 이동
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []); // 빈 의존성 배열로 컴포넌트 마운트 시에만 실행
+
   // 일정 클릭 시 상세 페이지로 이동
   const handleCourseClick = (course) => {
     const courseId = course.id || course._id;

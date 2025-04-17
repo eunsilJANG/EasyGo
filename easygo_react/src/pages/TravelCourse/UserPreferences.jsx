@@ -4,8 +4,8 @@ import DatePicker from 'react-datepicker';
 import { ko } from 'date-fns/locale';
 import "react-datepicker/dist/react-datepicker.css";
 import './UserPreferences.scss';
-import useUserStore from '../store/userStore';
-import { api, aiApi } from '../api/axios';
+import useUserStore from '../../store/userStore';
+import { api, aiApi } from '../../api/axios'; 
 
 const UserPreferences = () => {
   const navigate = useNavigate();
@@ -251,8 +251,6 @@ const UserPreferences = () => {
         {/* 날짜 선택 섹션 */}
         <section className="date-section">
           <h3>여행 일정</h3>
-
-          
           <div className="date-display">
             <div className="calendar-container">
               <DatePicker
@@ -273,13 +271,6 @@ const UserPreferences = () => {
                 <div className="selected-dates">
                   {startDate ? startDate.toLocaleDateString() : ''} ~ 
                   {endDate ? endDate.toLocaleDateString() : ''}
-                </div>
-              </div>
-              <div className="weather-info">
-                <span className="weather-icon">☀️</span>
-                <div className="weather-text">
-                  예상 날씨 - 맑음<br />
-                  <small>2025-03-07 기준 날씨 정보입니다.</small>
                 </div>
               </div>
             </div>
