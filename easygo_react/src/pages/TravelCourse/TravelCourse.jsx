@@ -59,6 +59,8 @@ const TravelCourse = () => {
     };
 
     loadCourseData();
+    // 페이지 진입 시 스크롤을 최상단으로 이동
+    window.scrollTo(0, 0);
   }, [location.state]);
 
   // 지도 컨테이너 스타일 추가
@@ -406,6 +408,25 @@ const TravelCourse = () => {
 
         <div className="course-info">
           <div className="location">{getLocationInfo()}</div>
+          {courseData.location && (
+            <div className="source-link">
+              <a 
+                href={courseData.location}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="source-button"
+              >
+                {(() => {
+                  const url = courseData.location;
+                  if (url.includes('youtube.com')) return '🎥 유튜브로 이동하기';
+                  if (url.includes('blog.naver.com')) return '📝 블로그로 이동하기';
+                  if (url.includes('in.naver.com')) return '📱 인플루언서 페이지로 이동하기';
+                  if (url.includes('tv.naver.com')) return '📺 네이버TV로 이동하기';
+                  return '🔗 원본 콘텐츠로 이동하기';
+                })()}
+              </a>
+            </div>
+          )}
           <div className="tags-container">
             {courseData.tags?.map((tag, index) => (
               <span key={index} className="tag">#{tag}</span>
@@ -423,15 +444,17 @@ const TravelCourse = () => {
           >
             일정 확인
           </button>
-          <button 
-            className={`tab ${activeTab === 'map' ? 'active' : ''}`}
-            onClick={() => {
-              setActiveTab('map');
-              setIsEditMode(false);
-            }}
-          >
-            지도 확인
-          </button>
+          {!location.state?.hideMap && (
+            <button 
+              className={`tab ${activeTab === 'map' ? 'active' : ''}`}
+              onClick={() => {
+                setActiveTab('map');
+                setIsEditMode(false);
+              }}
+            >
+              지도 확인
+            </button>
+          )}
           <button 
             className={`tab ${activeTab === 'edit' ? 'active' : ''}`}
             onClick={() => {

@@ -3,11 +3,8 @@ import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-route
 
 import Header from './components/Layout/Header';
 import Footer from './components/Layout/Footer';
-import Login from './pages/Login';
-import Contact from './pages/Contact';
-import TravelSchedule from './pages/TravelSchedule';
+import Login from './pages/Login/Login';
 import ContentInput from './pages/ContentInput';
-import PlaceSelection from './pages/PlaceSelection';
 import UserPreferences from './pages/UserPreferences';
 import SignUp from './pages/SignUp';
 import Community from './pages/Community/ArticleList';
@@ -22,22 +19,19 @@ import './App.scss'; // 글로벌 스타일링
 
 const AppLayout = () => {
   const location = useLocation();
-  const isAuthPage = location.pathname === '/' || 
-                    location.pathname === '/signup' || 
-                    location.pathname === '/set-nickname';
-  const showHeaderFooter = !isAuthPage;
+  const hideHeaderFooter = ['/login', '/signup', '/set-nickname'].includes(location.pathname);
 
   return (
     <div className="app-container">
-      {showHeaderFooter && <Header />}
+      {!hideHeaderFooter && <Header />}
       <Routes>
+        <Route path="/" element={<Login />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<SignUp />} />
         <Route path="/set-nickname" element={<SetNickname />} />
-        <Route path="/contact" element={<Contact />} />
-        <Route path="/travel-schedule" element={<TravelSchedule />} />
+  
         <Route path="/content-input" element={<ContentInput />} />
-        <Route path="/place-selection" element={<PlaceSelection />} />
+
         <Route path="/preferences" element={<UserPreferences />} />
         <Route path="/community" element={<Community />} />
         <Route path="/community/write" element={<WriteArticle />} />
@@ -48,7 +42,7 @@ const AppLayout = () => {
         <Route path="/wish" element={<div>Wish Page</div>} />
         <Route path="/travel-course" element={<TravelCourse />} />
       </Routes>
-      {showHeaderFooter && <Footer />}
+      {!hideHeaderFooter && <Footer />}
     </div>
   );
 };
@@ -60,7 +54,7 @@ const App = () => {
     if (localStorage.getItem('access_token')) {
       fetchCurrentUser();
     }
-  }, []);
+  }, [fetchCurrentUser]);
 
   return (
     <Router>

@@ -1,12 +1,9 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from .travelcourse import router as travel_router
-from .database import redis_client  # engine, Base 제거
+from .database import redis_client
 import logging
-
-# 로깅 설정
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+from .content import router as content_router
 
 app = FastAPI(title="EasyGo API")
 
@@ -28,6 +25,7 @@ app.add_middleware(
 
 # 라우터 등록
 app.include_router(travel_router, prefix="/generate_course", tags=["travel"])
+app.include_router(content_router)
 
 @app.on_event("startup")
 async def startup_event():
@@ -36,8 +34,3 @@ async def startup_event():
         print("Successfully connected to Redis")
     except Exception as e:
         print(f"Failed to connect to Redis: {e}")
-
-@app.on_event("shutdown")
-async def shutdown_event():
-    # 필요한 정리 작업 수행
-    pass

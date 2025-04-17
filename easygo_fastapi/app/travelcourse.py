@@ -278,10 +278,7 @@ async def generate_travel_course(preferences: TravelPreference):
             preferences.region, preferences.areas
         )
 
-        # activities 리스트를 합치기
-        activities = activities + experiences
-
-        if not tourist_spots and not restaurants and not cafes and not accommodations:
+        if not tourist_spots and not restaurants and not cafes:
             raise HTTPException(status_code=404, detail=f"No places found for region '{region}' and areas {areas}")
 
         # 액티비티 분류
@@ -420,13 +417,13 @@ async def generate_travel_course(preferences: TravelPreference):
                     ))
                     used_places.add(night_spot['name'])
 
-            # 숙박
-            if accommodations:
+            # 숙박 추가 (마지막 일차가 아닌 경우에만)
+            if day_num < total_days - 1 and accommodations:
                 accommodation = next((a for a in accommodations if a['name'] not in used_places), None)
                 if accommodation:
                     spots.append(TravelSpot(
                         name=accommodation['name'],
-                        time="22:00",
+                        time="21:00",
                         address=accommodation['address'],
                         description="숙박",
                         category="숙박",

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import useUserStore from '../../store/userStore';
 import './Header.scss';
 import { api } from '../../api/axios';
@@ -8,8 +8,11 @@ const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef(null);
   const navigate = useNavigate();
+  const location = useLocation();
   const nickname = useUserStore((state) => state.nickname);
   const setUserInfo = useUserStore((state) => state.setUserInfo);
+
+  const isLoginPage = location.pathname === '/login';
 
   useEffect(() => {
     console.log('Current nickname:', nickname);
@@ -131,9 +134,11 @@ const Header = () => {
             </div>
           </>
         ) : (
-          <Link to="/login" className="login-button">
-            로그인
-          </Link>
+          !isLoginPage && (
+            <Link to="/login" className="login-button">
+              로그인
+            </Link>
+          )
         )}
       </div>
     </header>

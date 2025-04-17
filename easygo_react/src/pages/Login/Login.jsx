@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import googleLogo from '../assets/img/google.png';
+import googleLogo from '../../assets/img/google.png';
 import './Login.scss';
-import useUserStore from '../store/userStore';
+import useUserStore from '../../store/userStore';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -109,56 +109,53 @@ const Login = () => {
             비회원으로 둘러보기
           </button>
         </div>
-  
-     
       </div>
+
+      {/* <form onSubmit={handleSubmit} className="login-form">
+        {error && <div className="error-message">{error}</div>}
+        <div className="input-group">
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="이메일"
+            required
+            disabled={isLoading}
+          />
+        </div>
+        <div className="input-group">
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="비밀번호"
+            required
+            disabled={isLoading}
+          />
+        </div>
+        <button 
+          type="submit" 
+          className="login-button"
+          disabled={isLoading}
+        >
+          {isLoading ? '로그인 중...' : '로그인'}
+        </button>
+        <div className="form-footer">
+          <Link to="/signup" className="signup-link">회원가입</Link>
+          <Link to="/forgot-password" className="forgot-password-link">비밀번호 찾기</Link>
+        </div>
+      </form>
+
+      <div className="divider">
+        <span>또는</span>
+      </div> */}
+
+      {/* <div className="footer-links">
+        <Link to="/privacy" className="footer-link">개인정보보호침</Link>
+        <Link to="/terms" className="footer-link">이용약관</Link>
+      </div> */}
     </div>
   );
-        
-        // {/* <form onSubmit={handleSubmit} className="login-form">
-        //   {error && <div className="error-message">{error}</div>}
-        //   <div className="input-group">
-        //     <input
-        //       type="email"
-        //       value={email}
-        //       onChange={(e) => setEmail(e.target.value)}
-        //       placeholder="이메일"
-        //       required
-        //       disabled={isLoading}
-        //     />
-        //   </div>
-        //   <div className="input-group">
-        //     <input
-        //       type="password"
-        //       value={password}
-        //       onChange={(e) => setPassword(e.target.value)}
-        //       placeholder="비밀번호"
-        //       required
-        //       disabled={isLoading}
-        //     />
-        //   </div>
-        //   <button 
-        //     type="submit" 
-        //     className="login-button"
-        //     disabled={isLoading}
-        //   >
-        //     {isLoading ? '로그인 중...' : '로그인'}
-        //   </button>
-        //   <div className="form-footer">
-        //     <Link to="/signup" className="signup-link">회원가입</Link>
-        //     <Link to="/forgot-password" className="forgot-password-link">비밀번호 찾기</Link>
-        //   </div>
-        // </form>
+};
 
-        // <div className="divider">
-        //   <span>또는</span>
-        // </div> */}
-
-
-        // {/* <div className="footer-links">
-        //   <Link to="/privacy" className="footer-link">개인정보보호침</Link>
-        //   <Link to="/terms" className="footer-link">이용약관</Link>
-        // </div> */}
- 
-}
 export default Login;

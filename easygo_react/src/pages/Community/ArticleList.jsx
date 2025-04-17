@@ -11,6 +11,11 @@ const Community = () => {
   const navigate = useNavigate();
   const { id } = useUserStore();
 
+  const isLoggedIn = () => {
+    const token = localStorage.getItem('access_token');
+    return !!token;
+  };
+
   const fetchArticles = async () => {
     try {
       const response = await api.get('/api/articles');
@@ -25,6 +30,8 @@ const Community = () => {
 
   useEffect(() => {
     fetchArticles();
+    // 페이지 진입 시 스크롤을 최상단으로 이동
+    window.scrollTo(0, 0);
   }, []);
 
   const handleBackToList = () => {
@@ -49,22 +56,29 @@ const Community = () => {
   }
 
   const handleWriteClick = () => {
-    if (!id) {
+    if (!isLoggedIn()) {
       alert('로그인이 필요한 서비스입니다.');
+      navigate('/login');
       return;
     }
     navigate('/community/write');
   };
 
   const handleArticleClick = async (articleId) => {
-    if (!id) {
+    if (!isLoggedIn()) {
       alert('로그인이 필요한 서비스입니다.');
       navigate('/login');
       return;
     }
 
     try {
-      const response = await api.post(`/api/articles/${articleId}/view`);
+      const token = localStorage.getItem('access_token');
+      const response = await api.post(`/api/articles/${articleId}/view`, null, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
       setArticles(prevArticles => 
         prevArticles.map(article => 
           article.id === articleId 
@@ -76,7 +90,8 @@ const Community = () => {
     } catch (error) {
       console.error('Error:', error);
       if (error.response && error.response.status === 401) {
-        alert('로그인이 필요한 서비스입니다.');
+        localStorage.removeItem('access_token');
+        alert('로그인이 만료되었습니다. 다시 로그인해주세요.');
         navigate('/login');
       }
     }
